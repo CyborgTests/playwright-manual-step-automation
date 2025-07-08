@@ -9,6 +9,15 @@ Cyborg Test is a powerful extension for [Playwright](https://playwright.dev/) th
 When a manual step is hit, a separate window appears showing the step description that needs to be executed, so a tester can mark it as passed or failed. 
 This lets you combine automated checks with human input in the same test case.
 
+## 🤖 Demo
+
+See how Cyborg Test turns manual steps into streamlined Playwright tests:
+[YouTube - 🤖 Introducing CyborgTests - Stop Wrestling with Partially Automatable Tests!](https://www.youtube.com/watch?v=jO-N1Fcofog&ab_channel=HOTtesting)
+<div align="center">
+  <img alt="Demo 1" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/686cc5f569c8520273bee57d_ezgif-1db8ce85447022.gif" />
+  <img alt="Demo 2" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/686cc5fc2d926905f881c677_ezgif-1ea65483285706.gif" />
+</div>
+
 ## 🚀 Installation
 
 ```bash
@@ -48,15 +57,6 @@ await manualStep.soft('This is a soft manual step'); // Test continues if this s
 
 - Soft fails are shown as warnings in the UI and annotated in the test report.
 - Use soft fails for non-critical manual verifications where you want to highlight issues but not fail the entire test.
-
-## 🤖 Demo
-
-See how Cyborg Test turns manual steps into streamlined Playwright tests:
-[YouTube - 🤖 Introducing CyborgTests - Stop Wrestling with Partially Automatable Tests!](https://www.youtube.com/watch?v=jO-N1Fcofog&ab_channel=HOTtesting)
-<div align="center">
-  <img alt="Demo 1" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/686cc5f569c8520273bee57d_ezgif-1db8ce85447022.gif" />
-  <img alt="Demo 2" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/686cc5fc2d926905f881c677_ezgif-1ea65483285706.gif" />
-</div>
 
 ## 📊 Analytics Configuration
 

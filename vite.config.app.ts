@@ -10,7 +10,7 @@ const __dirname = dirname(__filename);
 export default defineConfig({
   plugins: [react(), viteSingleFile()],
   build: {
-    outDir: 'app-build',
+    outDir: 'control-panel-build',
   },
   resolve: {
     alias: {

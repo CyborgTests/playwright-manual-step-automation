@@ -4,7 +4,7 @@ const path = require('path');
 const modulePath = require.resolve('@cyborgtests/test');
 const moduleDir = path.dirname(modulePath);
 const rootDir = path.resolve(moduleDir, '..');
-const htmlPath = path.join(rootDir, 'app-build', 'index.html');
+const htmlPath = path.join(rootDir, 'control-panel-build', 'index.html');
 
 // Generate simple UUID-like ID: timestamp + random hex
 function generateId() {

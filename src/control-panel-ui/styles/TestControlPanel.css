@@ -1,0 +1,88 @@
+#container {
+  width: 280px;
+  margin: 10px auto;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+h3, h4 {
+  margin: 0;
+  padding: 0;
+}
+h3 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 16px;
+  word-wrap: break-word;
+}
+h4 {
+  color: #7f8c8d;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+ol {
+  padding-left: 20px;
+  margin-top: 5px;
+}
+li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+button {
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+button:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+.btn-success {
+  background-color: #2ecc71;
+  color: white;
+}
+.btn-success:hover {
+  background-color: #27ae60;
+}
+.btn-danger {
+  background-color: #e74c3c;
+  color: white;
+}
+.btn-danger:hover {
+  background-color: #c0392b;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+.divider {
+  height: 1px;
+  background-color: #eee;
+  margin: 15px 0;
+}
+.step-pass {
+  color: #2ecc71;
+}
+.step-fail {
+  color: #e74c3c;
+}
+.step-warning {
+  color: #f1c40f;
+}

@@ -1,0 +1,44 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+.footer {
+  margin-top: 15px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.footer-link {
+  color: #7f8c8d;
+  text-decoration: none;
+  font-size: 12px;
+  width: unset;
+  background-color: transparent;
+  font-weight: 400;
+}
+.footer-link:hover {
+  color: #3498db;
+}
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 10px;
+}
+
+.openDocumentPIP {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  padding: 5px;
+  width: unset;
+  font-size: 0;
+}

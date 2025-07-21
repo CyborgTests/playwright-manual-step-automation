@@ -1,6 +1,6 @@
 {
   "name": "@cyborgtests/test",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Powerfull extension for Playwright, that allows you to include manual verification steps in your automated test flow",
   "main": "dist/index.umd.js",
   "module": "dist/index.es.js",
@@ -15,9 +15,11 @@
   },
   "scripts": {
     "build:lib": "vite build",
-    "build:app": "vite build --config vite.config.app.ts",
-    "prepare": "npm run build:app && npm run build:lib",
+    "build:controlPanel": "vite build --config vite.config.app.ts",
+    "build:testBuilder": "vite build --config vite.config.testBuilder.ts",
+    "prepare": "npm run build:controlPanel && npm run build:lib && npm run build:testBuilder",
     "dev": "vite --config vite.config.app.ts",
+    "dev:testBuilder": "vite --config vite.config.testBuilder.ts",
     "preview": "vite preview",
     "postinstall": "node src/postinstall/generate-uuid.js"
   },
@@ -46,7 +48,8 @@
   },
   "files": [
     "dist",
-    "app-build",
+    "control-panel-build",
+    "test-builder-build",
     "README.md",
     "LICENSE",
     "package.json",

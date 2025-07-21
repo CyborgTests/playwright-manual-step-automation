@@ -9,7 +9,7 @@ const moduleDir = path.dirname(modulePath);
 const rootDir = path.resolve(moduleDir, '..');
 
 export async function startServer(port: number): Promise<ChildProcess> {
-  const appBuildPath = path.join(rootDir, 'app-build');
+  const appBuildPath = path.join(rootDir, 'control-panel-build');
 
   // Create a custom server
   const server = http.createServer((req, res) => {

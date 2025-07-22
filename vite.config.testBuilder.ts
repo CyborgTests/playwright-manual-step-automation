@@ -9,16 +9,17 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
   plugins: [react(), viteSingleFile()],
-  base: 'control-panel',
+  base: 'test-builder',
+  publicDir: 'test-builder-src/public',
   build: {
-    outDir: 'control-panel-build'
+    outDir: 'test-builder-build',
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src')
+      '@': resolve(__dirname, './test-builder-src')
     }
   },
   server: {
-    port: 3000
+    port: 3001
   }
 });

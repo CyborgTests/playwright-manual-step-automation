@@ -1,8 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Layout from './components/Layout';
-import App from './components/App';
-import { Analytics } from './components/Analytics';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -10,9 +7,10 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <Analytics />
-    <Layout>
-      <App />
-    </Layout>
+    <button onClick={() => {
+      console.log('clicked');
+    }}>
+      Click me
+    </button>
   </React.StrictMode>
 );

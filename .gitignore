@@ -7,6 +7,7 @@ node_modules/
 /control-panel-build
 /test-builder-build
 /dist
+/index.html
 
 .env
 .DS_Store

@@ -18,10 +18,12 @@
     "build:controlPanel": "vite build --config vite.config.app.ts",
     "build:testBuilder": "vite build --config vite.config.testBuilder.ts",
     "prepare": "npm run build:controlPanel && npm run build:lib && npm run build:testBuilder",
+    "predev": "node src/scripts/copy-html.js app",
     "dev": "vite --config vite.config.app.ts",
-    "dev:testBuilder": "vite --config vite.config.testBuilder.ts",
+    "prebuild:testBuilder": "node src/scripts/copy-html.js generator",
+    "dev:testBuilder": "npm run prebuild:testBuilder && vite --config vite.config.testBuilder.ts",
     "preview": "vite preview",
-    "postinstall": "node src/postinstall/generate-uuid.js"
+    "postinstall": "node src/scripts/generate-uuid.js"
   },
   "keywords": [
     "testing",

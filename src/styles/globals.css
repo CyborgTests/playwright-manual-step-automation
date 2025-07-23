@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@config "../../tailwind.config.ts";
+
+@layer base {
+    :root {
+        --chart-1: 160 60% 45%;
+        --chart-2: 350 70% 56%;
+        --chart-3: 0 8% 65%;
+        --chart-4: 280 65% 60%;
+        --chart-5: 340 75% 55%;
+    }
+  
+    .dark {
+        --chart-1: 160 60% 45%;
+        --chart-2: 350 70% 56%;
+        --chart-3: 0 8% 65%;
+        --chart-4: 280 65% 60%;
+        --chart-5: 340 75% 55%;
+    }
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.openDocumentPIP {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  padding: 5px;
+  width: unset;
+  font-size: 0;
+}

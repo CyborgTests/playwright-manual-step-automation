@@ -1,26 +1,20 @@
-import React, { Fragment, useEffect } from 'react';
+import React from 'react';
 import Footer from './Footer';
 import Header from './Header';
 import TestControlPanel from './TestControlPanel';
-// import OpenDocumentPIP from './OpenDocumentPIP';
 import { TestStoreProvider } from '../store/TestStore';
-
-// Add TypeScript interface for Document PiP
-declare global {
-  interface Window {
-    documentPictureInPicture: {
-      requestWindow(options: { width: string; height: string }): Promise<Window>;
-    };
-  }
-}
+import { HeroUIProvider } from "@heroui/system";
 
 export default function App() {
   return (
     <TestStoreProvider>
-      <Header />
-      <TestControlPanel />
-      <Footer />
-      {/* <OpenDocumentPIP /> */}
+      <HeroUIProvider>
+        <div className="relative flex flex-col h-screen bg-background">
+          <Header />
+          <TestControlPanel />
+          <Footer />
+        </div>
+      </HeroUIProvider>
     </TestStoreProvider>
   );
 } 

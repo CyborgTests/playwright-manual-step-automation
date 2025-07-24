@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { Navbar, NavbarContent, NavbarBrand, NavbarItem } from '@heroui/react';
-import ThemeSwitch from './ThemeSwitch';
+// import ThemeSwitch from './ThemeSwitch';
 
 export default function Header() {
   return (
@@ -21,7 +21,7 @@ export default function Header() {
             </div>
           </NavbarBrand>
         </NavbarContent>
-        <ThemeSwitch />
+        {/* <ThemeSwitch /> */}
       </Navbar>
     </Fragment>
   );

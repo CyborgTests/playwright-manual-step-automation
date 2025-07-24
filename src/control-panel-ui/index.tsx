@@ -6,7 +6,7 @@ import { Analytics } from './components/Analytics';
 import '../styles/globals.css';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById('cyborg-app') as HTMLElement
 );
 
 root.render(

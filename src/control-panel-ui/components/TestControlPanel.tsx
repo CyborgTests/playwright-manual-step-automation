@@ -23,7 +23,7 @@ export default function TestControlPanel() {
 
   return (
     <main className="flex-1 px-6 py-12">
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-md mx-auto transition-none">
         <CardBody className="p-6">
           <TestInfo />
           <Divider className="my-4" />

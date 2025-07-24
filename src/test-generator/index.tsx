@@ -1,16 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import EventRecorderApp from './components/EventRecorderApp';
+import { EventRecorderProvider } from './store/EventRecorderStore';
+import '../styles/globals.css';
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById('cyborg-app') as HTMLElement
 );
 
 root.render(
   <React.StrictMode>
-    <button onClick={() => {
-      console.log('clicked');
-    }}>
-      Click me
-    </button>
+    <EventRecorderProvider>
+      <EventRecorderApp />
+    </EventRecorderProvider>
   </React.StrictMode>
 );

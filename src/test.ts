@@ -13,7 +13,7 @@ import openInDefaultBrowser from "./utils/openInDefaultBrowser";
 const getFile = async () => {
   const fs = await import('fs/promises');
   const path = await import('path');
-  const testBuilderAppPath = path.resolve(process.cwd(), 'test-builder-build');
+  const testBuilderAppPath = path.resolve(process.cwd(), 'node_modules/@cyborgtests/test/test-builder-build');
 
   const html = await fs.readFile(path.join(testBuilderAppPath, 'index.html'), 'utf-8');
 

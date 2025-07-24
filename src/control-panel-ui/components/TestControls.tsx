@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Input } from '@heroui/react';
-import { Button } from '@heroui/button'
+import { Input, Button } from '@heroui/react';
 
 import { useTestStore } from '../store/TestStore';
 import { trackEvent } from '../../utils/analytics';

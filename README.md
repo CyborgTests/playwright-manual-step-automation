@@ -44,6 +44,71 @@ await manualStep.soft('This is a soft manual step'); // Test continues if this s
 - Soft fails are shown as warnings in the UI and annotated in the test report.
 - Use soft fails for non-critical manual verifications where you want to highlight issues but not fail the entire test.
 
+# Test Builder
+
+The Test Builder is a powerful visual test recording tool that allows you to create Playwright tests by interacting with web pages. It automatically captures user interactions and generates executable Playwright test code.
+
+## Features
+
+### 🎯 **Visual Test Recording**
+- **Click Recording**: Automatically captures clicks on any element
+- **Form Input Recording**: Records text input and form interactions
+- **Navigation Detection**: Intelligently handles page navigation and link clicks
+
+### 🎨 **Interactive UI**
+- **Context Menu**: Right-click on any element for additional actions
+- **Real-time Recording**: See recorded elements as you interact
+- **Test Generation**: Generate Playwright code with one click
+- **Copy to Clipboard**: Easy code copying for immediate use
+
+### 🔧 **Advanced Actions**
+- **Element Verification**: Mark elements as "should exist" or "should not exist"
+- **Focus Actions**: Record focus events for accessibility testing
+- **Smart Selectors**: Generates robust CSS selectors for reliable test execution
+
+## How It Works
+
+### 1. **Start Recording**
+The test builder automatically starts recording when loaded. You'll see a control panel showing the number of recorded elements.
+
+### 2. **Interact with the Page**
+- **Click** any element to record a click action
+- **Type** in input fields to record form interactions
+- **Right-click** elements for additional verification options
+
+### 3. **Generate Test Code**
+- Click the "Generate Test" button to create Playwright code
+- Copy the generated code to your clipboard
+- Paste into your test file
+
+## Generated Code Examples
+
+### Basic Click Test
+```typescript
+await page.click('button[data-testid="submit"]');
+```
+
+### Form Interaction
+```typescript
+await page.fill('input[name="email"]', 'user@example.com');
+await page.click('button[type="submit"]');
+```
+
+### Element Verification
+```typescript
+await expect(page.locator('.success-message')).toBeVisible();
+await expect(page.locator('.error-message')).not.toBeVisible();
+```
+
+## Context Menu Actions
+
+Right-click on any element to access additional recording options:
+
+- **Should Exist**: Verify element is visible
+- **Should Not Exist**: Verify element is hidden
+- **Focus**: Record focus event
+- **Click**: Record click event
+
 ## Analytics Configuration
 
 The package includes Google Analytics integration that is enabled by default. The following data is collected:

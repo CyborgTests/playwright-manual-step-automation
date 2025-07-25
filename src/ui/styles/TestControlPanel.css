@@ -40,7 +40,6 @@ button {
   border-radius: 4px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.2s;
 }
 button:disabled {
   opacity: 0.7;

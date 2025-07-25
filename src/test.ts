@@ -10,6 +10,25 @@ import { config } from "./config";
 import { startServer } from "./utils/server";
 import openInDefaultBrowser from "./utils/openInDefaultBrowser";
 
+const getFile = async () => {
+  const fs = await import('fs/promises');
+  const path = await import('path');
+  const testBuilderAppPath = path.resolve(process.cwd(), 'node_modules/@cyborgtests/test/test-builder-build');
+
+  const html = await fs.readFile(path.join(testBuilderAppPath, 'index.html'), 'utf-8');
+
+  // extract <script> contents — only inline, not external src
+  const script = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)]
+    .map(match => match[1])
+    .join('\n');
+
+  const styles = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)]
+    .map(match => match[1])
+    .join('\n');
+
+  return { script, styles };
+};
+
 class TestFailedError extends Error {
   constructor(message: string) {
     super(message);
@@ -35,6 +54,25 @@ const test = pwTest.extend<{
     const tcPage = await tcBrowser.newPage({
       viewport: { width: 500, height: 750 },
     });
+
+    const { script, styles } = await getFile();
+    await page.addInitScript(({ script: scriptContent, styles: stylesContent }) => {
+      document.addEventListener('DOMContentLoaded', () => {
+        const rootDiv = document.createElement('div');
+        rootDiv.id = 'cyborg-app';
+        document.body.appendChild(rootDiv);
+
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.textContent = scriptContent;
+        document.head.appendChild(script);
+
+        const style = document.createElement('style');
+        style.setAttribute('rel', 'stylesheet');
+        style.textContent = stylesContent;
+        document.head.appendChild(style);
+      });
+    }, { script, styles });
 
     await tcPage.goto(`http://localhost:${config.uiPort}`);
 

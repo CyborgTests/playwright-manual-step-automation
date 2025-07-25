@@ -1,17 +1,13 @@
 import { ChildProcess } from 'child_process';
-import http from 'http';
-import fs from 'fs';
-import path from 'path';
 import { config } from '../config';
 
-const modulePath = require.resolve('@cyborgtests/test');
-const moduleDir = path.dirname(modulePath);
-const rootDir = path.resolve(moduleDir, '..');
-
 export async function startServer(port: number): Promise<ChildProcess> {
-  const appBuildPath = path.join(rootDir, 'app-build');
+  const http = await import('http');
+  const fs = await import('fs');
+  const path = await import('path');
 
-  // Create a custom server
+  const appBuildPath = path.resolve(process.cwd(), 'node_modules/@cyborgtests/test/control-panel-build');
+
   const server = http.createServer((req, res) => {
     const url = req.url || '/';
     const filePath = path.join(appBuildPath, url === '/' ? 'index.html' : url);
@@ -72,7 +68,6 @@ export async function startServer(port: number): Promise<ChildProcess> {
           }
         });
         server.listen(currentPort, () => {
-          console.log(`Server started on port ${currentPort}`);
           config.setConfig({
             uiPort: currentPort,
           });
@@ -89,7 +84,7 @@ export async function startServer(port: number): Promise<ChildProcess> {
     }
   }
 
-  await waitForServer(currentPort);
+  await waitForServer(currentPort, http);
 
   // Create a ChildProcess-like object that wraps the http server
   const serverProcess = {
@@ -101,13 +96,12 @@ export async function startServer(port: number): Promise<ChildProcess> {
   return serverProcess;
 }
 
-async function waitForServer(port: number, maxAttempts = 10): Promise<void> {
+async function waitForServer(port: number, http: any, maxAttempts = 10): Promise<void> {
   for (let i = 0; i < maxAttempts; i++) {
     try {
       await new Promise<void>((resolve, reject) => {
-        http.get(`http://localhost:${port}`, (res) => {
+        http.get(`http://localhost:${port}`, (res: any) => {
           if (res.statusCode === 200) {
-            console.log('Server is ready!');
             resolve();
           } else {
             reject(new Error(`Server returned ${res.statusCode}`));

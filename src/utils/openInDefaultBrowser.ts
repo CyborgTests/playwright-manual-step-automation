@@ -1,7 +1,6 @@
-function openInDefaultBrowser(url: string) {
-  const { exec } = require('child_process');
-  const os = require('os');
-
+async function openInDefaultBrowser(url: string) {
+  const { exec } = await import('child_process');
+  const os = await import('os');
   const currentPlatform = os.platform();
   const commands = {
     darwin: `open "${url}"`,

@@ -68,7 +68,6 @@ export async function startServer(port: number): Promise<ChildProcess> {
           }
         });
         server.listen(currentPort, () => {
-          console.log(`Server started on port ${currentPort}`);
           config.setConfig({
             uiPort: currentPort,
           });
@@ -103,7 +102,6 @@ async function waitForServer(port: number, http: any, maxAttempts = 10): Promise
       await new Promise<void>((resolve, reject) => {
         http.get(`http://localhost:${port}`, (res: any) => {
           if (res.statusCode === 200) {
-            console.log('Server is ready!');
             resolve();
           } else {
             reject(new Error(`Server returned ${res.statusCode}`));

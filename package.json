@@ -16,9 +16,6 @@
   "repository": {
     "url": "https://github.com/CyborgTests/cyborg-test"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "scripts": {
     "build:lib": "tsup",
     "build:controlPanel": "npm run predev && vite build --config vite.config.app.ts",

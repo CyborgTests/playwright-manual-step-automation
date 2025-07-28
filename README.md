@@ -13,9 +13,13 @@ This lets you combine automated checks with human input in the same test case.
 
 See how Cyborg Test turns manual steps into streamlined Playwright tests:
 [YouTube - 🤖 Introducing CyborgTests - Stop Wrestling with Partially Automatable Tests!](https://www.youtube.com/watch?v=jO-N1Fcofog&ab_channel=HOTtesting)
+
 <div align="center">
-  <img alt="Demo 1" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/686cc5f569c8520273bee57d_ezgif-1db8ce85447022.gif" />
-  <img alt="Demo 2" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/686cc5fc2d926905f881c677_ezgif-1ea65483285706.gif" />
+    <img alt="Demo 2" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/68874ae64e22ec7bf685969e_manualStep.gif" />
+    <div>Manual Step Demo</div>
+    <br />
+    <img alt="Demo 1" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/68874aebb6babee061d07ad2_testBuilder.gif" />
+    <div>Test Builder Demo</div>
 </div>
 
 ## 🚀 Installation

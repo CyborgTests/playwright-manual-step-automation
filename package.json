@@ -1,25 +1,32 @@
 {
   "name": "@cyborgtests/test",
-  "version": "0.0.7",
+  "version": "0.0.9",
   "description": "Powerfull extension for Playwright, that allows you to include manual verification steps in your automated test flow",
-  "main": "dist/index.umd.js",
-  "module": "dist/index.es.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "repository": {
     "url": "https://github.com/CyborgTests/cyborg-test"
   },
   "scripts": {
-    "build:lib": "vite build",
-    "build:app": "vite build --config vite.config.app.ts",
-    "prepare": "npm run build:app && npm run build:lib",
+    "build:lib": "tsup",
+    "build:controlPanel": "npm run predev && vite build --config vite.config.app.ts",
+    "build:testBuilder": "npm run prebuild:testBuilder && vite build --config vite.config.testBuilder.ts",
+    "prepare": "npm run build:controlPanel && npm run build:lib && npm run build:testBuilder",
+    "predev": "node src/scripts/copy-html.js app",
     "dev": "vite --config vite.config.app.ts",
+    "prebuild:testBuilder": "node src/scripts/copy-html.js generator",
+    "dev:testBuilder": "npm run prebuild:testBuilder && vite --config vite.config.testBuilder.ts",
     "preview": "vite preview",
-    "postinstall": "node src/postinstall/generate-uuid.js"
+    "postinstall": "node src/scripts/generate-uuid.js"
   },
   "keywords": [
     "testing",
@@ -30,30 +37,37 @@
   "author": "",
   "license": "MIT",
   "peerDependencies": {
-    "@playwright/test": "^1.52.0"
+    "@playwright/test": "^1.53.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.52.0",
+    "@heroui/react": "^2.8.1",
+    "@heroui/system": "^2.4.19",
+    "@heroui/theme": "^2.4.19",
+    "@medv/finder": "^4.0.2",
+    "@playwright/test": "^1.53.0",
+    "@tailwindcss/vite": "^4.1.11",
     "@types/node": "^22.15.18",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.4",
     "@vitejs/plugin-react": "^4.0.0",
+    "postcss-prefix-selector": "^2.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.11",
+    "tsup": "^8.5.0",
     "typescript": "^5.0.0",
     "vite": "^5.4.11",
     "vite-plugin-singlefile": "^2.2.0"
   },
   "files": [
     "dist",
-    "app-build",
+    "control-panel-build",
+    "test-builder-build",
     "README.md",
     "LICENSE",
     "package.json",
     "package-lock.json",
     "src"
   ],
-  "dependencies": {
-    "os": "^0.1.2"
-  }
+  "dependencies": {}
 }

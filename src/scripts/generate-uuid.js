@@ -1,10 +1,11 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const modulePath = require.resolve('@cyborgtests/test');
+const modulePath = fileURLToPath(import.meta.url);
 const moduleDir = path.dirname(modulePath);
-const rootDir = path.resolve(moduleDir, '..');
-const htmlPath = path.join(rootDir, 'app-build', 'index.html');
+const rootDir = path.resolve(moduleDir, '..', '..', '..');
+const htmlPath = path.join(rootDir, 'test', 'control-panel-build', 'index.html');
 
 // Generate simple UUID-like ID: timestamp + random hex
 function generateId() {

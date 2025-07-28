@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
+import { Card, CardBody, Divider } from '@heroui/react';
 import { useTestStore } from '../store/TestStore';
 import TestControls from './TestControls';
 import StepsList from './StepsList';
 import TestInfo from './TestInfo';
-import '../styles/TestControlPanel.css';
 
 export default function TestControlPanel() {
   const { dispatch } = useTestStore();
@@ -22,12 +22,15 @@ export default function TestControlPanel() {
   }, [dispatch]);
 
   return (
-    <div id="container">
-      <TestInfo />
-      <div className="divider"></div>
-      <StepsList />
-      <div className="divider"></div>
-      <TestControls />
-    </div>
+    <main className="flex-1 px-6 py-12">
+      <Card className="w-full max-w-md mx-auto transition-none">
+        <CardBody className="p-6">
+          <TestInfo />
+          <Divider className="my-4" />
+          <StepsList />
+          <TestControls />
+        </CardBody>
+      </Card>
+    </main>
   );
 }

@@ -4,8 +4,10 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /blobs
-/app-build
+/control-panel-build
+/test-builder-build
 /dist
+/index.html
 
 .env
 .DS_Store

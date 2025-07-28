@@ -10,9 +10,9 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
   plugins: [react(), viteSingleFile(), tailwindcss()],
-  base: 'control-panel',
+  base: 'test-builder',
   build: {
-    outDir: 'control-panel-build'
+    outDir: 'test-builder-build',
   },
   resolve: {
     alias: {
@@ -20,6 +20,6 @@ export default defineConfig({
     }
   },
   server: {
-    port: 3000
+    port: 3001
   }
 });

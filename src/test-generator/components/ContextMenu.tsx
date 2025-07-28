@@ -69,7 +69,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         top: position.y
       }}
     >
-      <Dropdown isOpen={isVisible} onOpenChange={(open) => !open && onClose()}>
+      <Dropdown isOpen={isVisible} onOpenChange={(open) => !open && onClose()} portalContainer={document.getElementById('cyborg-app') as HTMLElement}>
         <DropdownTrigger>
           <div className="w-0 h-0" />
         </DropdownTrigger>

@@ -37,7 +37,7 @@
   "author": "",
   "license": "MIT",
   "peerDependencies": {
-    "@playwright/test": "^1.53.0"
+    "@playwright/test": "^1.54.2"
   },
   "devDependencies": {
     "@heroui/react": "^2.8.1",

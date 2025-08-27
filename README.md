@@ -15,6 +15,8 @@ This lets you combine automated checks with human input in the same test case.
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/CyborgTests/demo-playwright-manual-step-automation)
 
+**How to try locally:** [YouTube - How to Try CyborgTests locally](https://www.youtube.com/watch?v=QLSjvs11Oyw)
+
 See how Cyborg Test turns manual steps into streamlined Playwright tests:
 [YouTube - 🤖 Introducing CyborgTests - Stop Wrestling with Partially Automatable Tests!](https://www.youtube.com/watch?v=jO-N1Fcofog&ab_channel=HOTtesting)
 

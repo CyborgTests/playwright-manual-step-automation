@@ -1,13 +1,16 @@
-<a href="https://www.cyborgtests.com/" target="_blank">
-  <img src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/686bcc6d09e3deeafa38eaed_cyborg-test-banner.png" alt="Banner" style="width: 100%" />
-</a>
-
 # Cyborg Test
-**Capture Manual Steps. Create Automated Tests**
 
-Cyborg Test is a powerful extension for [Playwright](https://playwright.dev/) that allows you to include manual verification steps in your automated test flow. 
-When a manual step is hit, a separate window appears showing the step description that needs to be executed, so a tester can mark it as passed or failed. 
-This lets you combine automated checks with human input in the same test case.
+Cyborg Test is [Playwright](https://playwright.dev/) extension that lets you combine automated checks with human input in the same test case.
+
+When a manual step is hit, a separate window appears showing the step description that needs to be executed, so a tester can mark it as passed or failed.
+
+<div align="center">
+    <img alt="Demo 2" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/68874ae64e22ec7bf685969e_manualStep.gif" />
+    <div>Manual Step Demo</div>
+    <br />
+    <img alt="Demo 1" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/68874aebb6babee061d07ad2_testBuilder.gif" />
+    <div>Test Builder Demo</div>
+</div>
 
 ## 🤖 Demo
 
@@ -19,14 +22,6 @@ This lets you combine automated checks with human input in the same test case.
 
 See how Cyborg Test turns manual steps into streamlined Playwright tests:
 [YouTube - 🤖 Introducing CyborgTests - Stop Wrestling with Partially Automatable Tests!](https://www.youtube.com/watch?v=jO-N1Fcofog&ab_channel=HOTtesting)
-
-<div align="center">
-    <img alt="Demo 2" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/68874ae64e22ec7bf685969e_manualStep.gif" />
-    <div>Manual Step Demo</div>
-    <br />
-    <img alt="Demo 1" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/68874aebb6babee061d07ad2_testBuilder.gif" />
-    <div>Test Builder Demo</div>
-</div>
 
 ## 🚀 Installation
 

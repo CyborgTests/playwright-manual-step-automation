@@ -18,7 +18,14 @@ When a manual step is hit, a separate window appears showing the step descriptio
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/CyborgTests/demo-playwright-manual-step-automation)
 
-**How to try locally:** [YouTube - How to Try CyborgTests locally](https://www.youtube.com/watch?v=QLSjvs11Oyw)
+
+See full tutorial on how Cyborg Test turns manual steps into streamlined Playwright tests:
+<p align="center">
+    <a href="https://www.youtube.com/watch?v=QLSjvs11Oyw" target="_blank">
+      <img src="./readme-assets/keenethics-video-preview.png" 
+           alt="Watch on YouTube" width="600" />
+    </a>
+</p>
 
 See how Cyborg Test turns manual steps into streamlined Playwright tests:
 [YouTube - 🤖 Introducing CyborgTests - Stop Wrestling with Partially Automatable Tests!](https://www.youtube.com/watch?v=jO-N1Fcofog&ab_channel=HOTtesting)

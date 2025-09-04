@@ -5,7 +5,7 @@ Cyborg Test is [Playwright](https://playwright.dev/) extension that lets you com
 When a manual step is hit, a separate window appears showing the step description that needs to be executed, so a tester can mark it as passed or failed.
 
 <div align="center">
-    <img alt="Demo 2" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/68874ae64e22ec7bf685969e_manualStep.gif" />
+    <img alt="Demo 2" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/68b95361afb2e204e3e29301_manualStep_small.gif" />
     <div>Manual Step Demo</div>
     <br />
     <img alt="Demo 1" src="https://cdn.prod.website-files.com/67f5380f43dbd686532cd541/68874aebb6babee061d07ad2_testBuilder.gif" />

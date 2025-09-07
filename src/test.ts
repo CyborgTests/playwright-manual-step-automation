@@ -47,6 +47,7 @@ const test = pwTest.extend<{
   testControl: async ({ page, context, browser }, use) => {
     const tcBrowser = await chromium.launch({
       headless: false,
+      args: ['--window-position=0,0']
     });
 
     const server = await startServer(config.uiPort);
@@ -96,6 +97,26 @@ const test = pwTest.extend<{
     await tcPage.context().close();
     await tcBrowser.close();
     server.kill();
+  },
+  browser: async ({ browser }, use, testInfo) => {
+    const useCfg = testInfo.project.use as any;
+    const name = useCfg.defaultBrowserType as 'chromium' | 'firefox' | 'webkit';
+    if (name !== 'chromium') {
+      await use(browser);
+      return;
+    }
+    const channel = useCfg.channel as string | undefined;
+    const headless = !!useCfg.headless;
+    
+    const customBrowser: Browser = await chromium.launch({
+      headless,
+      channel,
+      args: [
+        '--window-position=500,0'
+      ],
+    });
+    await use(customBrowser);
+    await customBrowser.close();
   },
   manualStep: async ({ testControl, page, browser, context }, use) => {
     const manualStep = async (stepName: string, params: { isSoft?: boolean } = {}) =>

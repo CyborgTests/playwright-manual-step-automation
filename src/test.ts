@@ -45,80 +45,109 @@ const test = pwTest.extend<{
   manualStep: (stepName: string) => Promise<void>;
 }>({
   testControl: async ({ page, context, browser }, use) => {
-    const tcBrowser = await chromium.launch({
-      headless: false,
-    });
+    let tcBrowser: Browser | null = null;
+    let tcPage: Page | null = null;
+    let server: any = null;
 
-    const server = await startServer(config.uiPort);
+    const getTestControl = async () => {
+      if (!tcBrowser) {
+        tcBrowser = await chromium.launch({
+          headless: false,
+        });
 
-    const tcPage = await tcBrowser.newPage({
-      viewport: { width: 500, height: 750 },
-    });
+        server = await startServer(config.uiPort);
 
-    const { script, styles } = await getFile();
-    await page.addInitScript(({ script: scriptContent, styles: stylesContent }) => {
-      document.addEventListener('DOMContentLoaded', () => {
-        const rootDiv = document.createElement('div');
-        rootDiv.id = 'cyborg-app';
-        document.body.appendChild(rootDiv);
+        tcPage = await tcBrowser.newPage({
+          viewport: { width: 500, height: 750 },
+        });
 
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.textContent = scriptContent;
-        document.head.appendChild(script);
+        const { script, styles } = await getFile();
+        await page.addInitScript(({ script: scriptContent, styles: stylesContent }) => {
+          document.addEventListener('DOMContentLoaded', () => {
+            const rootDiv = document.createElement('div');
+            rootDiv.id = 'cyborg-app';
+            document.body.appendChild(rootDiv);
 
-        const style = document.createElement('style');
-        style.setAttribute('rel', 'stylesheet');
-        style.textContent = stylesContent;
-        document.head.appendChild(style);
-      });
-    }, { script, styles });
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.textContent = scriptContent;
+            document.head.appendChild(script);
 
-    await tcPage.goto(`http://localhost:${config.uiPort}`);
+            const style = document.createElement('style');
+            style.setAttribute('rel', 'stylesheet');
+            style.textContent = stylesContent;
+            document.head.appendChild(style);
+          });
+        }, { script, styles });
 
-    await tcPage.exposeFunction('openInMainBrowser', (link: string) => {
-      openInDefaultBrowser(link);
-    });
-    await tcPage.evaluate(() => {
-      (window as any).testUtils.openInMainBrowser = (window as any).openInMainBrowser;
-    });
+        await tcPage.goto(`http://localhost:${config.uiPort}`);
 
-    await tcPage.bringToFront();
+        await tcPage.exposeFunction('openInMainBrowser', (link: string) => {
+          openInDefaultBrowser(link);
+        });
+        await tcPage.evaluate(() => {
+          (window as any).testUtils.openInMainBrowser = (window as any).openInMainBrowser;
+        });
 
-    await use({
-      browser: tcBrowser,
-      context: tcPage.context(),
-      page: tcPage,
-    });
+        await tcPage.bringToFront();
+      }
+
+      return {
+        browser: tcBrowser,
+        context: tcPage!.context(),
+        page: tcPage!,
+      };
+    };
+
+    const testControlObj = {
+      get page() {
+        throw new Error('testControl.page is not available. Use manualStep() to initialize the control panel.');
+      },
+      get browser() {
+        throw new Error('testControl.browser is not available. Use manualStep() to initialize the control panel.');
+      },
+      get context() {
+        throw new Error('testControl.context is not available. Use manualStep() to initialize the control panel.');
+      },
+      _getTestControl: getTestControl,
+      _initialized: false,
+    };
+
+    await use(testControlObj as any);
 
     // Cleanup
-    await tcPage.close();
-    await tcPage.context().close();
-    await tcBrowser.close();
-    server.kill();
+    if (tcPage) {
+      await (tcPage as Page).close();
+    }
+    if (tcBrowser) {
+      await (tcBrowser as Browser).close();
+    }
+    if (server) {
+      server.kill();
+    }
   },
   manualStep: async ({ testControl, page, browser, context }, use) => {
     const manualStep = async (stepName: string, params: { isSoft?: boolean } = {}) =>
       await test.step(
         `✋ [MANUAL] ${stepName}`,
         async () => {
-          await testControl.page.evaluate((_testName) => {
+          const tc = await (testControl as any)._getTestControl();
+          (testControl as any)._initialized = true;
+          
+          await tc.page.evaluate((_testName: string) => {
             (window as any)?.testUtils?.setTestName(_testName);
           }, test.info().title);
 
-          // Write current step name
-          await testControl.page.evaluate(
-            ({ stepName, params }) => {
+          await tc.page.evaluate(
+            ({ stepName, params }: { stepName: string; params: { isSoft?: boolean } }) => {
               (window as any).testUtils?.addStep(stepName, params);
             },
             { stepName, params }
           );
 
-          // Pause for manual step
-          await testControl.page.pause();
+          await tc.page.pause();
 
-          // If last step failed, throw error
-          const hasFailed = await testControl.page.evaluate(() => {
+          const hasFailed = await tc.page.evaluate(() => {
             if ((window as any).testUtils.hasFailed) {
               delete (window as any).testUtils.hasFailed;
               return true;
@@ -126,7 +155,7 @@ const test = pwTest.extend<{
             return false;
           });
           if (hasFailed) {
-            const reason = await testControl.page.evaluate(() => {
+            const reason = await tc.page.evaluate(() => {
               const reason = (window as any).testUtils?.failedReason || '';
               delete (window as any).testUtils.failedReason;
               return reason;
@@ -148,20 +177,20 @@ const test = pwTest.extend<{
               type: 'softFail',
               description: `Soft fail in manual step: ${(err as Error).message}`,
             });
-            // This will mark the step as failed, but not fail the test
             await expect.soft(false, `Soft fail in manual step: ${(err as Error).message}`).toBeTruthy();
-            // Optionally log
             console.warn(`Soft fail in manual step: ${stepName}`, err);
           }
         },
         { box: true }
       );
     await use(manualStep);
-    // In case test interupted
     try {
-      await testControl.page.evaluate("playwright.resume()");
+      if ((testControl as any)._initialized) {
+        const tc = await (testControl as any)._getTestControl();
+        await tc.page.evaluate("playwright.resume()");
+      }
     } catch (err) {
-      // no-op
+      // no-op - control panel might not be initialized
     }
   },
 });

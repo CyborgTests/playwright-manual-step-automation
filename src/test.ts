@@ -127,6 +127,7 @@ const test = pwTest.extend<{
     }
   },
   manualStep: async ({ testControl, page, browser, context }, use) => {
+    let currentResumeResolver: (() => void) | null = null;
     const manualStep = async (stepName: string, params: { isSoft?: boolean } = {}) =>
       await test.step(
         `✋ [MANUAL] ${stepName}`,
@@ -145,7 +146,23 @@ const test = pwTest.extend<{
             { stepName, params }
           );
 
-          await tc.page.pause();
+          const resumePromise = new Promise<void>((resolve) => {
+            currentResumeResolver = resolve;
+          });
+          await tc.page.exposeFunction('resumeTest', () => {
+            if (currentResumeResolver) {
+              currentResumeResolver();
+              currentResumeResolver = null;
+            }
+          });
+
+          await tc.page.evaluate(() => {
+            if ((window as any).testUtils) {
+              (window as any).testUtils.resumeTest = (window as any).resumeTest;
+            }
+          });
+
+          await resumePromise;
 
           const hasFailed = await tc.page.evaluate(() => {
             if ((window as any).testUtils.hasFailed) {
@@ -185,9 +202,9 @@ const test = pwTest.extend<{
       );
     await use(manualStep);
     try {
-      if ((testControl as any)._initialized) {
-        const tc = await (testControl as any)._getTestControl();
-        await tc.page.evaluate("playwright.resume()");
+      if (currentResumeResolver) {
+        (currentResumeResolver as () => void)();
+        currentResumeResolver = null;
       }
     } catch (err) {
       // no-op - control panel might not be initialized

@@ -42,9 +42,11 @@ const test = pwTest.extend<{
     browser: Browser;
     context: BrowserContext;
   };
-  manualStep: (stepName: string) => Promise<void>;
+  manualStep: ((stepName: string, params?: { [key: string]: any }) => Promise<void>) & {
+    soft: (stepName: string, params?: { [key: string]: any }) => Promise<void>;
+  };
 }>({
-  testControl: async ({ page, context, browser }, use) => {
+  testControl: async ({ page, context, browser }, use, testInfo) => {
     let tcBrowser: Browser | null = null;
     let tcPage: Page | null = null;
     let server: any = null;
@@ -85,8 +87,29 @@ const test = pwTest.extend<{
         await tcPage.exposeFunction('openInMainBrowser', (link: string) => {
           openInDefaultBrowser(link);
         });
+
         await tcPage.evaluate(() => {
           (window as any).testUtils.openInMainBrowser = (window as any).openInMainBrowser;
+        });
+
+        await tcPage.exposeFunction('getTestInfo', () => {
+          return {
+            testId: testInfo.testId,
+            attachments: testInfo.attachments,
+            annotations: testInfo.annotations,
+            project: testInfo.project,
+            config: testInfo.config,
+            title: testInfo.title,
+            titlePath: testInfo.titlePath,
+            file: testInfo.file,
+            tags: testInfo.tags,
+          };
+        });
+        
+        await tcPage.exposeFunction('skipTest', () => {
+          if (testInfo.skip) {
+            testInfo.skip(true);
+          }
         });
 
         await tcPage.bringToFront();
@@ -128,19 +151,18 @@ const test = pwTest.extend<{
   },
   manualStep: async ({ testControl, page, browser, context }, use) => {
     let currentResumeResolver: (() => void) | null = null;
-    const manualStep = async (stepName: string, params: { isSoft?: boolean } = {}) =>
-      await test.step(
+    let resumeFunctionExposed = false;
+
+    const manualStep = async (stepName: string, params: { isSoft?: boolean; [key: string]: any } = {}) => {
+      test.setTimeout(0);
+      return await test.step(
         `✋ [MANUAL] ${stepName}`,
         async () => {
           const tc = await (testControl as any)._getTestControl();
           (testControl as any)._initialized = true;
           
-          await tc.page.evaluate((_testName: string) => {
-            (window as any)?.testUtils?.setTestName(_testName);
-          }, test.info().title);
-
           await tc.page.evaluate(
-            ({ stepName, params }: { stepName: string; params: { isSoft?: boolean } }) => {
+            ({ stepName, params }: { stepName: string; params: { isSoft?: boolean; [key: string]: any } }) => {
               (window as any).testUtils?.addStep(stepName, params);
             },
             { stepName, params }
@@ -149,12 +171,16 @@ const test = pwTest.extend<{
           const resumePromise = new Promise<void>((resolve) => {
             currentResumeResolver = resolve;
           });
-          await tc.page.exposeFunction('resumeTest', () => {
-            if (currentResumeResolver) {
-              currentResumeResolver();
-              currentResumeResolver = null;
-            }
-          });
+
+          if (!resumeFunctionExposed) {
+            await tc.page.exposeFunction('resumeTest', () => {
+              if (currentResumeResolver) {
+                currentResumeResolver();
+                currentResumeResolver = null;
+              }
+            });
+            resumeFunctionExposed = true;
+          }
 
           await tc.page.evaluate(() => {
             if ((window as any).testUtils) {
@@ -181,14 +207,15 @@ const test = pwTest.extend<{
             throw new TestFailedError(errorMessage);
           }
         },
-        { box: true }
+        { box: true, timeout: 0 }
       );
-    manualStep.soft = async (stepName: string) =>
+    };
+    manualStep.soft = async (stepName: string, params: { [key: string]: any } = {}) =>
       await test.step(
         `✋ [MANUAL][SOFT] ${stepName}`,
         async () => {
           try {
-            await manualStep(stepName, { isSoft: true });
+            await manualStep(stepName, { isSoft: true, ...params });
           } catch (err) {
             test.info().annotations.push({
               type: 'softFail',
@@ -198,7 +225,7 @@ const test = pwTest.extend<{
             console.warn(`Soft fail in manual step: ${stepName}`, err);
           }
         },
-        { box: true }
+        { box: true, timeout: 0 }
       );
     await use(manualStep);
     try {

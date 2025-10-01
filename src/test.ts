@@ -9,6 +9,12 @@ import { chromium } from "playwright";
 import { config } from "./config";
 import { startServer } from "./utils/server";
 import openInDefaultBrowser from "./utils/openInDefaultBrowser";
+import {
+  checkJiraConfig,
+  getJiraProjectKey,
+  getJiraIssueTypes,
+  createJiraTicket,
+} from "./utils/jira";
 
 const getFile = async () => {
   const fs = await import('fs/promises');
@@ -110,6 +116,22 @@ const test = pwTest.extend<{
           if (testInfo.skip) {
             testInfo.skip(true);
           }
+        });
+
+        await tcPage.exposeFunction('checkJiraConfig', () => {
+          return checkJiraConfig();
+        });
+
+        await tcPage.exposeFunction('getJiraProjectKey', () => {
+          return getJiraProjectKey();
+        });
+
+        await tcPage.exposeFunction('getJiraIssueTypes', async (projectKey: string) => {
+          return await getJiraIssueTypes(projectKey);
+        });
+
+        await tcPage.exposeFunction('createJiraTicket', async (ticketInfo: any) => {
+          return await createJiraTicket(ticketInfo);
         });
 
         await tcPage.bringToFront();

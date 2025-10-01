@@ -14,12 +14,14 @@ interface State {
   testName: string;
   steps: Step[];
   testInfo: InjectedTestInfo | undefined;
+  createJiraTicket: boolean;
 }
 
 const initialState: State = {
   testName: 'Loading...',
   steps: [],
   testInfo: undefined,
+  createJiraTicket: false,
 };
 
 // Actions
@@ -29,7 +31,8 @@ export type Action =
   | { type: 'ADD_STEP'; payload: { step: string; isSoft?: boolean; data?: Record<string, any> } }
   | { type: 'PASS_STEP' }
   | { type: 'FAIL_STEP'; payload: string }
-  | { type: 'SKIP_STEP' };
+  | { type: 'SKIP_STEP' }
+  | { type: 'TOGGLE_JIRA_TICKET' };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -78,6 +81,9 @@ function reducer(state: State, action: Action): State {
         };
       }
       return { ...state, steps };
+    }
+    case 'TOGGLE_JIRA_TICKET': {
+      return { ...state, createJiraTicket: !state.createJiraTicket };
     }
     default:
       return state;

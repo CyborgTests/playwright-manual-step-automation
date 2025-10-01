@@ -69,5 +69,7 @@
     "package-lock.json",
     "src"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "react-hot-toast": "^2.6.0"
+  }
 }

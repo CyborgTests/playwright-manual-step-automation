@@ -136,6 +136,12 @@ export default function StepsList() {
                 >
                   Skip Step
                 </Button>
+                <Button
+                  className="w-full bg-indigo-500 text-white"
+                  onPress={() => dispatch({ type: 'TOGGLE_JIRA_TICKET' })}
+                >
+                  Create Jira Ticket
+                </Button>
               </div>
               {step.data && Object.keys(step.data).length > 0 && (
                 <div className="mt-3">

@@ -25,7 +25,7 @@ export default function TestControls() {
         onPress={() => {
           if (controlButtonsAreDisabled) return;
           dispatch({ type: 'PASS_STEP' });
-          (window as any).playwright?.resume();
+          (window as any).testUtils?.resumeTest?.();
           trackButtonClick('pass_step');
         }}
       >
@@ -50,7 +50,7 @@ export default function TestControls() {
           dispatch({ type: 'FAIL_STEP', payload: failureReason || 'No failure reason provided' });
           (window as any).testUtils.hasFailed = true;
           (window as any).testUtils.failedReason = failureReason;
-          (window as any).playwright?.resume();
+          (window as any).testUtils?.resumeTest?.();
           setFailureReason('');
           trackButtonClick('fail_step');
         }}

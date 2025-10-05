@@ -1,4 +1,5 @@
 import React, { createContext, useContext, ReactNode, Dispatch } from 'react';
+import type { InjectedTestInfo } from '../../types';
 
 // Types
 export type Step = {
@@ -6,33 +7,48 @@ export type Step = {
   status: 'pending' | 'pass' | 'fail' | 'warning';
   reason?: string;
   isSoft?: boolean;
+  data?: Record<string, any>;
 };
 
 interface State {
   testName: string;
   steps: Step[];
+  testInfo: InjectedTestInfo | undefined;
+  createJiraTicket: boolean;
 }
 
 const initialState: State = {
   testName: 'Loading...',
   steps: [],
+  testInfo: undefined,
+  createJiraTicket: false,
 };
 
 // Actions
 export type Action =
   | { type: 'SET_TEST_NAME'; payload: string }
-  | { type: 'ADD_STEP'; payload: { step: string; isSoft?: boolean } }
+  | { type: 'SET_TEST_INFO'; payload: InjectedTestInfo }
+  | { type: 'ADD_STEP'; payload: { step: string; isSoft?: boolean; data?: Record<string, any> } }
   | { type: 'PASS_STEP' }
-  | { type: 'FAIL_STEP'; payload: string };
+  | { type: 'FAIL_STEP'; payload: string }
+  | { type: 'SKIP_STEP' }
+  | { type: 'TOGGLE_JIRA_TICKET' };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'SET_TEST_NAME':
       return { ...state, testName: action.payload };
+    case 'SET_TEST_INFO':
+      return { ...state, testInfo: action.payload };
     case 'ADD_STEP':
       return {
         ...state,
-        steps: [...state.steps, { text: action.payload.step, status: 'pending', isSoft: action.payload.isSoft }],
+        steps: [...state.steps, { 
+          text: action.payload.step, 
+          status: 'pending', 
+          isSoft: action.payload.isSoft,
+          data: action.payload.data
+        }],
       };
     case 'PASS_STEP': {
       const steps = [...state.steps];
@@ -54,6 +70,20 @@ function reducer(state: State, action: Action): State {
         };
       }
       return { ...state, steps };
+    }
+    case 'SKIP_STEP': {
+      const steps = [...state.steps];
+      if (steps.length > 0) {
+        steps[steps.length - 1] = {
+          ...steps[steps.length - 1],
+          status: 'warning',
+          reason: 'Step skipped',
+        };
+      }
+      return { ...state, steps };
+    }
+    case 'TOGGLE_JIRA_TICKET': {
+      return { ...state, createJiraTicket: !state.createJiraTicket };
     }
     default:
       return state;

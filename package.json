@@ -1,6 +1,6 @@
 {
   "name": "@cyborgtests/test",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Powerfull extension for Playwright, that allows you to include manual verification steps in your automated test flow",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -8,9 +8,9 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "repository": {
@@ -37,14 +37,14 @@
   "author": "",
   "license": "MIT",
   "peerDependencies": {
-    "@playwright/test": "^1.53.0"
+    "@playwright/test": "^1.54.2"
   },
   "devDependencies": {
     "@heroui/react": "^2.8.1",
     "@heroui/system": "^2.4.19",
     "@heroui/theme": "^2.4.19",
     "@medv/finder": "^4.0.2",
-    "@playwright/test": "^1.53.0",
+    "@playwright/test": "^1.54.2",
     "@tailwindcss/vite": "^4.1.11",
     "@types/node": "^22.15.18",
     "@types/react": "^19.1.4",
@@ -69,5 +69,7 @@
     "package-lock.json",
     "src"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "react-hot-toast": "^2.6.0"
+  }
 }

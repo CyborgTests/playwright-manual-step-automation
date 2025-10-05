@@ -9,6 +9,12 @@ import { chromium } from "playwright";
 import { config } from "./config";
 import { startServer } from "./utils/server";
 import openInDefaultBrowser from "./utils/openInDefaultBrowser";
+import {
+  checkJiraConfig,
+  getJiraProjectKey,
+  getJiraIssueTypes,
+  createJiraTicket,
+} from "./utils/jira";
 
 const getFile = async () => {
   const fs = await import('fs/promises');
@@ -42,83 +48,171 @@ const test = pwTest.extend<{
     browser: Browser;
     context: BrowserContext;
   };
-  manualStep: (stepName: string) => Promise<void>;
+  manualStep: ((stepName: string, params?: { [key: string]: any }) => Promise<void>) & {
+    soft: (stepName: string, params?: { [key: string]: any }) => Promise<void>;
+  };
 }>({
-  testControl: async ({ page, context, browser }, use) => {
-    const tcBrowser = await chromium.launch({
-      headless: false,
-    });
+  testControl: async ({ page, context, browser }, use, testInfo) => {
+    let tcBrowser: Browser | null = null;
+    let tcPage: Page | null = null;
+    let server: any = null;
 
-    const server = await startServer(config.uiPort);
+    const getTestControl = async () => {
+      if (!tcBrowser) {
+        tcBrowser = await chromium.launch({
+          headless: false,
+        });
 
-    const tcPage = await tcBrowser.newPage({
-      viewport: { width: 500, height: 750 },
-    });
+        server = await startServer(config.uiPort);
 
-    const { script, styles } = await getFile();
-    await page.addInitScript(({ script: scriptContent, styles: stylesContent }) => {
-      document.addEventListener('DOMContentLoaded', () => {
-        const rootDiv = document.createElement('div');
-        rootDiv.id = 'cyborg-app';
-        document.body.appendChild(rootDiv);
+        tcPage = await tcBrowser.newPage({
+          viewport: { width: 500, height: 750 },
+        });
 
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.textContent = scriptContent;
-        document.head.appendChild(script);
+        const { script, styles } = await getFile();
+        await page.addInitScript(({ script: scriptContent, styles: stylesContent }) => {
+          document.addEventListener('DOMContentLoaded', () => {
+            const rootDiv = document.createElement('div');
+            rootDiv.id = 'cyborg-app';
+            document.body.appendChild(rootDiv);
 
-        const style = document.createElement('style');
-        style.setAttribute('rel', 'stylesheet');
-        style.textContent = stylesContent;
-        document.head.appendChild(style);
-      });
-    }, { script, styles });
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.textContent = scriptContent;
+            document.head.appendChild(script);
 
-    await tcPage.goto(`http://localhost:${config.uiPort}`);
+            const style = document.createElement('style');
+            style.setAttribute('rel', 'stylesheet');
+            style.textContent = stylesContent;
+            document.head.appendChild(style);
+          });
+        }, { script, styles });
 
-    await tcPage.exposeFunction('openInMainBrowser', (link: string) => {
-      openInDefaultBrowser(link);
-    });
-    await tcPage.evaluate(() => {
-      (window as any).testUtils.openInMainBrowser = (window as any).openInMainBrowser;
-    });
+        await tcPage.goto(`http://localhost:${config.uiPort}`);
 
-    await tcPage.bringToFront();
+        await tcPage.exposeFunction('openInMainBrowser', (link: string) => {
+          openInDefaultBrowser(link);
+        });
 
-    await use({
-      browser: tcBrowser,
-      context: tcPage.context(),
-      page: tcPage,
-    });
+        await tcPage.evaluate(() => {
+          (window as any).testUtils.openInMainBrowser = (window as any).openInMainBrowser;
+        });
+
+        await tcPage.exposeFunction('getTestInfo', () => {
+          return {
+            testId: testInfo.testId,
+            attachments: testInfo.attachments,
+            annotations: testInfo.annotations,
+            project: testInfo.project,
+            config: testInfo.config,
+            title: testInfo.title,
+            titlePath: testInfo.titlePath,
+            file: testInfo.file,
+            tags: testInfo.tags,
+          };
+        });
+        
+        await tcPage.exposeFunction('skipTest', () => {
+          if (testInfo.skip) {
+            testInfo.skip(true);
+          }
+        });
+
+        await tcPage.exposeFunction('checkJiraConfig', () => {
+          return checkJiraConfig();
+        });
+
+        await tcPage.exposeFunction('getJiraProjectKey', () => {
+          return getJiraProjectKey();
+        });
+
+        await tcPage.exposeFunction('getJiraIssueTypes', async (projectKey: string) => {
+          return await getJiraIssueTypes(projectKey);
+        });
+
+        await tcPage.exposeFunction('createJiraTicket', async (ticketInfo: any) => {
+          return await createJiraTicket(ticketInfo);
+        });
+
+        await tcPage.bringToFront();
+      }
+
+      return {
+        browser: tcBrowser,
+        context: tcPage!.context(),
+        page: tcPage!,
+      };
+    };
+
+    const testControlObj = {
+      get page() {
+        throw new Error('testControl.page is not available. Use manualStep() to initialize the control panel.');
+      },
+      get browser() {
+        throw new Error('testControl.browser is not available. Use manualStep() to initialize the control panel.');
+      },
+      get context() {
+        throw new Error('testControl.context is not available. Use manualStep() to initialize the control panel.');
+      },
+      _getTestControl: getTestControl,
+      _initialized: false,
+    };
+
+    await use(testControlObj as any);
 
     // Cleanup
-    await tcPage.close();
-    await tcPage.context().close();
-    await tcBrowser.close();
-    server.kill();
+    if (tcPage) {
+      await (tcPage as Page).close();
+    }
+    if (tcBrowser) {
+      await (tcBrowser as Browser).close();
+    }
+    if (server) {
+      server.kill();
+    }
   },
   manualStep: async ({ testControl, page, browser, context }, use) => {
-    const manualStep = async (stepName: string, params: { isSoft?: boolean } = {}) =>
-      await test.step(
+    let currentResumeResolver: (() => void) | null = null;
+    let resumeFunctionExposed = false;
+
+    const manualStep = async (stepName: string, params: { isSoft?: boolean; [key: string]: any } = {}) => {
+      test.setTimeout(0);
+      return await test.step(
         `✋ [MANUAL] ${stepName}`,
         async () => {
-          await testControl.page.evaluate((_testName) => {
-            (window as any)?.testUtils?.setTestName(_testName);
-          }, test.info().title);
-
-          // Write current step name
-          await testControl.page.evaluate(
-            ({ stepName, params }) => {
+          const tc = await (testControl as any)._getTestControl();
+          (testControl as any)._initialized = true;
+          
+          await tc.page.evaluate(
+            ({ stepName, params }: { stepName: string; params: { isSoft?: boolean; [key: string]: any } }) => {
               (window as any).testUtils?.addStep(stepName, params);
             },
             { stepName, params }
           );
 
-          // Pause for manual step
-          await testControl.page.pause();
+          const resumePromise = new Promise<void>((resolve) => {
+            currentResumeResolver = resolve;
+          });
 
-          // If last step failed, throw error
-          const hasFailed = await testControl.page.evaluate(() => {
+          if (!resumeFunctionExposed) {
+            await tc.page.exposeFunction('resumeTest', () => {
+              if (currentResumeResolver) {
+                currentResumeResolver();
+                currentResumeResolver = null;
+              }
+            });
+            resumeFunctionExposed = true;
+          }
+
+          await tc.page.evaluate(() => {
+            if ((window as any).testUtils) {
+              (window as any).testUtils.resumeTest = (window as any).resumeTest;
+            }
+          });
+
+          await resumePromise;
+
+          const hasFailed = await tc.page.evaluate(() => {
             if ((window as any).testUtils.hasFailed) {
               delete (window as any).testUtils.hasFailed;
               return true;
@@ -126,7 +220,7 @@ const test = pwTest.extend<{
             return false;
           });
           if (hasFailed) {
-            const reason = await testControl.page.evaluate(() => {
+            const reason = await tc.page.evaluate(() => {
               const reason = (window as any).testUtils?.failedReason || '';
               delete (window as any).testUtils.failedReason;
               return reason;
@@ -135,33 +229,34 @@ const test = pwTest.extend<{
             throw new TestFailedError(errorMessage);
           }
         },
-        { box: true }
+        { box: true, timeout: 0 }
       );
-    manualStep.soft = async (stepName: string) =>
+    };
+    manualStep.soft = async (stepName: string, params: { [key: string]: any } = {}) =>
       await test.step(
         `✋ [MANUAL][SOFT] ${stepName}`,
         async () => {
           try {
-            await manualStep(stepName, { isSoft: true });
+            await manualStep(stepName, { isSoft: true, ...params });
           } catch (err) {
             test.info().annotations.push({
               type: 'softFail',
               description: `Soft fail in manual step: ${(err as Error).message}`,
             });
-            // This will mark the step as failed, but not fail the test
             await expect.soft(false, `Soft fail in manual step: ${(err as Error).message}`).toBeTruthy();
-            // Optionally log
             console.warn(`Soft fail in manual step: ${stepName}`, err);
           }
         },
-        { box: true }
+        { box: true, timeout: 0 }
       );
     await use(manualStep);
-    // In case test interupted
     try {
-      await testControl.page.evaluate("playwright.resume()");
+      if (currentResumeResolver) {
+        (currentResumeResolver as () => void)();
+        currentResumeResolver = null;
+      }
     } catch (err) {
-      // no-op
+      // no-op - control panel might not be initialized
     }
   },
 });

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Input, Button } from '@heroui/react';
+import { Button, Input } from '@heroui/react';
+import React, { useState } from 'react';
 
-import { useTestStore } from '../store/TestStore';
 import { trackEvent } from '../../utils/analytics';
+import { useTestStore } from '../store/TestStore';
 
 export default function TestControls() {
   const { state } = useTestStore();

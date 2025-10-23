@@ -7,14 +7,14 @@ import {
 } from '@playwright/test';
 import { chromium } from 'playwright';
 import { config } from './config';
-import { startServer } from './utils/server';
-import openInDefaultBrowser from './utils/openInDefaultBrowser';
 import {
   checkJiraConfig,
-  getJiraProjectKey,
-  getJiraIssueTypes,
   createJiraTicket,
+  getJiraIssueTypes,
+  getJiraProjectKey,
 } from './utils/jira';
+import openInDefaultBrowser from './utils/openInDefaultBrowser';
+import { startServer } from './utils/server';
 
 const getFile = async () => {
   const fs = await import('fs/promises');
@@ -61,7 +61,7 @@ const test = pwTest.extend<{
     soft: (stepName: string, params?: { [key: string]: any }) => Promise<void>;
   };
 }>({
-  testControl: async ({ page, context, browser }, use, testInfo) => {
+  testControl: async ({ page }, use, testInfo) => {
     let tcBrowser: Browser | null = null;
     let tcPage: Page | null = null;
     let server: any = null;
@@ -197,7 +197,7 @@ const test = pwTest.extend<{
       server.kill();
     }
   },
-  manualStep: async ({ testControl, page, browser, context }, use) => {
+  manualStep: async ({ testControl }, use) => {
     let currentResumeResolver: (() => void) | null = null;
     let resumeFunctionExposed = false;
 
@@ -298,7 +298,7 @@ const test = pwTest.extend<{
         (currentResumeResolver as () => void)();
         currentResumeResolver = null;
       }
-    } catch (err) {
+    } catch {
       // no-op - control panel might not be initialized
     }
   },

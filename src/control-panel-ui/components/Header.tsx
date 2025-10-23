@@ -1,5 +1,5 @@
+import { Navbar, NavbarBrand, NavbarContent } from '@heroui/react';
 import React, { Fragment } from 'react';
-import { Navbar, NavbarContent, NavbarBrand, NavbarItem } from '@heroui/react';
 // import ThemeSwitch from './ThemeSwitch';
 
 export default function Header() {

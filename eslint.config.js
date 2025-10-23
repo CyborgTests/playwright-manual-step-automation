@@ -86,4 +86,13 @@ export default [
       },
     },
   },
+  {
+    files: ['src/test.ts'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/immutability': 'off',
+    },
+  },
 ];

@@ -82,7 +82,7 @@ export async function startServer(port: number): Promise<ChildProcess> {
         });
       });
       break;
-    } catch (err) {
+    } catch {
       if (i === maxPortAttempts - 1) {
         throw new Error(
           `Failed to start server after ${maxPortAttempts} attempts`

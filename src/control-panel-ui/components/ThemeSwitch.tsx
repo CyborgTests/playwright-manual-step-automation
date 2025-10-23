@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 const SunFilledIcon = ({
   size = 24,
@@ -46,25 +46,18 @@ const MoonFilledIcon = ({
   </svg>
 );
 
+const getInitialTheme = () => {
+  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+  if (savedTheme) {
+    return savedTheme;
+  }
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light';
+};
+
 export default function ThemeSwitch() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const prefersDark = window.matchMedia(
-      '(prefers-color-scheme: dark)'
-    ).matches;
-
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-    } else if (prefersDark) {
-      setTheme('dark');
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
+  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme());
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -72,10 +65,6 @@ export default function ThemeSwitch() {
     localStorage.setItem('theme', newTheme);
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <button

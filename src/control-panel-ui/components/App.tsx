@@ -1,21 +1,19 @@
+import { HeroUIProvider } from '@heroui/system';
 import React from 'react';
-import Footer from './Footer';
-import TestControlPanel from './TestControlPanel';
-import JiraTicket from './JiraTicket';
-import { TestStoreProvider, useTestStore } from '../store/TestStore';
-import { HeroUIProvider } from "@heroui/system";
 import { Toaster } from 'react-hot-toast';
+import { TestStoreProvider, useTestStore } from '../store/TestStore';
+import Footer from './Footer';
+import JiraTicket from './JiraTicket';
+import TestControlPanel from './TestControlPanel';
 
 function AppContent() {
   const { state } = useTestStore();
 
   return (
     <div className="relative flex flex-col h-screen bg-background">
-      {
-        state.createJiraTicket ? <JiraTicket /> : <TestControlPanel />
-      }
+      {state.createJiraTicket ? <JiraTicket /> : <TestControlPanel />}
       <Footer />
-      <Toaster 
+      <Toaster
         position="bottom-center"
         toastOptions={{
           style: {
@@ -36,4 +34,4 @@ export default function App() {
       </HeroUIProvider>
     </TestStoreProvider>
   );
-} 
+}

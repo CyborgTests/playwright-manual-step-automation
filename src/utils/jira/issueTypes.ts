@@ -6,7 +6,9 @@ export interface JiraIssueType {
   description?: string;
 }
 
-export async function getJiraIssueTypes(projectKey: string): Promise<JiraIssueType[]> {
+export async function getJiraIssueTypes(
+  projectKey: string
+): Promise<JiraIssueType[]> {
   const config = getJiraConfig();
 
   if (!config || !projectKey) {
@@ -20,8 +22,8 @@ export async function getJiraIssueTypes(projectKey: string): Promise<JiraIssueTy
       {
         method: 'GET',
         headers: {
-          'Authorization': `Basic ${auth}`,
-          'Accept': 'application/json',
+          Authorization: `Basic ${auth}`,
+          Accept: 'application/json',
         },
       }
     );
@@ -45,4 +47,3 @@ export async function getJiraIssueTypes(projectKey: string): Promise<JiraIssueTy
     return [];
   }
 }
-

@@ -8,19 +8,27 @@ export default function TestControlPanel() {
 
   useEffect(() => {
     (window as any).testUtils = {
-      addStep: (step: string, params: { isSoft?: boolean; [key: string]: any } = {}) => {
+      addStep: (
+        step: string,
+        params: { isSoft?: boolean; [key: string]: any } = {}
+      ) => {
         const { isSoft, ...data } = params;
-        dispatch({ type: 'ADD_STEP', payload: { step, isSoft: isSoft || false, data } });
+        dispatch({
+          type: 'ADD_STEP',
+          payload: { step, isSoft: isSoft || false, data },
+        });
       },
     };
     // Cleanup
-    return () => { delete (window as any).testUtils; };
+    return () => {
+      delete (window as any).testUtils;
+    };
   }, [dispatch]);
 
   useEffect(() => {
     const loadTestInfo = async () => {
       const getTestInfo = window.getTestInfo;
-      
+
       if (getTestInfo) {
         const testInfo = await getTestInfo();
         dispatch({ type: 'SET_TEST_INFO', payload: testInfo });

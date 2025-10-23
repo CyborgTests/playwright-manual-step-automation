@@ -12,14 +12,14 @@ export default defineConfig({
   plugins: [react(), viteSingleFile(), tailwindcss()],
   base: 'control-panel',
   build: {
-    outDir: 'control-panel-build'
+    outDir: 'control-panel-build',
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src')
-    }
+      '@': resolve(__dirname, './src'),
+    },
   },
   server: {
-    port: 3000
-  }
+    port: 3000,
+  },
 });

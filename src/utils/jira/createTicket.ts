@@ -26,15 +26,21 @@ function convertToADF(description: string) {
     version: 1,
     content: description.split('\n').map((line: string) => ({
       type: 'paragraph',
-      content: line.trim() ? [{
-        type: 'text',
-        text: line
-      }] : []
-    }))
+      content: line.trim()
+        ? [
+            {
+              type: 'text',
+              text: line,
+            },
+          ]
+        : [],
+    })),
   };
 }
 
-export async function createJiraTicket(ticketInfo: TicketInfo): Promise<CreateTicketResult> {
+export async function createJiraTicket(
+  ticketInfo: TicketInfo
+): Promise<CreateTicketResult> {
   const config = getJiraConfig();
 
   if (!config) {
@@ -63,8 +69,8 @@ export async function createJiraTicket(ticketInfo: TicketInfo): Promise<CreateTi
     const response = await fetch(`${config.baseUrl}/rest/api/3/issue`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${auth}`,
-        'Accept': 'application/json',
+        Authorization: `Basic ${auth}`,
+        Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(issueData),
@@ -75,7 +81,10 @@ export async function createJiraTicket(ticketInfo: TicketInfo): Promise<CreateTi
       console.error('Jira API error:', errorData);
       return {
         success: false,
-        error: errorData.errorMessages?.join(', ') || errorData.errors ? JSON.stringify(errorData.errors) : `HTTP error! status: ${response.status}`
+        error:
+          errorData.errorMessages?.join(', ') || errorData.errors
+            ? JSON.stringify(errorData.errors)
+            : `HTTP error! status: ${response.status}`,
       };
     }
 
@@ -85,8 +94,7 @@ export async function createJiraTicket(ticketInfo: TicketInfo): Promise<CreateTi
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
-

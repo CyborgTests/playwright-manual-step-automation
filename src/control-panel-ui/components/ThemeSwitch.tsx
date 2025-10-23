@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
-const SunFilledIcon = ({ size = 24, ...props }: { size?: number; [key: string]: any }) => (
+const SunFilledIcon = ({
+  size = 24,
+  ...props
+}: {
+  size?: number;
+  [key: string]: any;
+}) => (
   <svg
     aria-hidden="true"
     focusable="false"
@@ -17,7 +23,13 @@ const SunFilledIcon = ({ size = 24, ...props }: { size?: number; [key: string]: 
   </svg>
 );
 
-const MoonFilledIcon = ({ size = 24, ...props }: { size?: number; [key: string]: any }) => (
+const MoonFilledIcon = ({
+  size = 24,
+  ...props
+}: {
+  size?: number;
+  [key: string]: any;
+}) => (
   <svg
     aria-hidden="true"
     focusable="false"
@@ -41,8 +53,10 @@ export default function ThemeSwitch() {
   useEffect(() => {
     setMounted(true);
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches;
+
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.classList.toggle('dark', savedTheme === 'dark');
@@ -70,8 +84,12 @@ export default function ThemeSwitch() {
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       <div className="w-auto h-auto bg-transparent rounded-lg flex items-center justify-center group-data-[selected=true]:bg-transparent !text-default-500 pt-px px-0 mx-0">
-        {theme === 'light' ? <SunFilledIcon size={28} /> : <MoonFilledIcon size={20} />}
+        {theme === 'light' ? (
+          <SunFilledIcon size={28} />
+        ) : (
+          <MoonFilledIcon size={20} />
+        )}
       </div>
     </button>
   );
-} 
+}

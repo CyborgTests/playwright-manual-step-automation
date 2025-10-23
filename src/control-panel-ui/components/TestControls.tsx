@@ -14,7 +14,8 @@ export default function TestControls() {
     trackEvent(`app_${buttonName}_click`);
   };
 
-  const controlButtonsAreDisabled = state.steps[state.steps.length - 1]?.status !== 'pending';
+  const controlButtonsAreDisabled =
+    state.steps[state.steps.length - 1]?.status !== 'pending';
 
   return (
     <div className="space-y-3">
@@ -31,23 +32,26 @@ export default function TestControls() {
       >
         ✅ Step passed
       </Button>
-      
-      <Input 
-        placeholder="Failure reason" 
-        id="failureReasonInput" 
-        value={failureReason} 
-        onChange={(e) => setFailureReason(e.target.value)}
+
+      <Input
+        placeholder="Failure reason"
+        id="failureReasonInput"
+        value={failureReason}
+        onChange={e => setFailureReason(e.target.value)}
         className={`w-full ${controlButtonsAreDisabled ? 'opacity-50 pointer-events-none' : ''}`}
         variant="bordered"
       />
-      
+
       <Button
         color="primary"
         className={`w-full ${controlButtonsAreDisabled ? 'opacity-50 pointer-events-none' : ''}`}
         disableAnimation
         onPress={() => {
           if (controlButtonsAreDisabled) return;
-          dispatch({ type: 'FAIL_STEP', payload: failureReason || 'No failure reason provided' });
+          dispatch({
+            type: 'FAIL_STEP',
+            payload: failureReason || 'No failure reason provided',
+          });
           (window as any).testUtils.hasFailed = true;
           (window as any).testUtils.failedReason = failureReason;
           (window as any).testUtils?.resumeTest?.();
@@ -59,4 +63,4 @@ export default function TestControls() {
       </Button>
     </div>
   );
-} 
+}

@@ -1,6 +1,11 @@
 export interface RecordedElement {
   selector: string;
-  eventType: 'click' | 'keydown' | 'should-exists' | 'should-not-exist' | 'focus';
+  eventType:
+    | 'click'
+    | 'keydown'
+    | 'should-exists'
+    | 'should-not-exist'
+    | 'focus';
   data?: {
     text?: string;
     mightNavigate?: boolean;
@@ -9,20 +14,22 @@ export interface RecordedElement {
   };
 }
 
-export const generatePlaywrightTest = (recordedElements: RecordedElement[]): string => {
+export const generatePlaywrightTest = (
+  recordedElements: RecordedElement[]
+): string => {
   if (recordedElements.length === 0) {
     return '// No recorded elements to generate test from';
   }
 
   let testCode = ``;
 
-  recordedElements.forEach((element) => {
+  recordedElements.forEach(element => {
     if (element.eventType === 'click') {
       if (element.data?.isDirectLinkClick && element.data?.href) {
         testCode += `await page.goto('${element.data.href}');\n`;
       } else {
         testCode += `await page.click('${element.selector}');\n`;
-        
+
         if (element.data?.mightNavigate) {
           testCode += `await page.waitForLoadState('networkidle');\n`;
         }

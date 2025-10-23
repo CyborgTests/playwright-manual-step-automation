@@ -7,6 +7,7 @@
 ## 🧩 Ways to Contribute
 
 ### 🐞 Report Bugs
+
 If you encounter a bug or unexpected behavior, please open an issue with:
 
 - A clear and descriptive title
@@ -16,6 +17,7 @@ If you encounter a bug or unexpected behavior, please open an issue with:
 - Environment details (OS, Node.js version, Playwright version, etc.)
 
 ### 💡 Suggest Features
+
 Have an idea to improve the project? Let us know! Please explain:
 
 - What the feature does
@@ -23,6 +25,7 @@ Have an idea to improve the project? Let us know! Please explain:
 - How it might be implemented (if you have ideas)
 
 ### 💻 Submit Code
+
 We welcome pull requests for:
 
 - Bug fixes

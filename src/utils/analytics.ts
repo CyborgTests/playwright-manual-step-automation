@@ -11,7 +11,10 @@ const isAnalyticsEnabled = () => {
   return typeof window !== 'undefined' && window.ENABLE_ANALYTICS !== false;
 };
 
-export const trackEvent = (eventName: string, eventParams?: Record<string, any>) => {
+export const trackEvent = (
+  eventName: string,
+  eventParams?: Record<string, any>
+) => {
   if (NODE_ENV === 'development') return;
   if (isAnalyticsEnabled() && window.gtag) {
     window.gtag('event', eventName, eventParams);

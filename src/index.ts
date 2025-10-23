@@ -1,5 +1,5 @@
-import test from "./test";
-import { config } from "./config";
+import test from './test';
+import { config } from './config';
 
 export { config };
 

@@ -35,4 +35,3 @@ export function getJiraProjectKey(): string {
 export function createAuthHeader(email: string, apiToken: string): string {
   return Buffer.from(`${email}:${apiToken}`).toString('base64');
 }
-

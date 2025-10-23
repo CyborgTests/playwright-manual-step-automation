@@ -26,7 +26,11 @@
     "prebuild:testBuilder": "node src/scripts/copy-html.js generator",
     "dev:testBuilder": "npm run prebuild:testBuilder && vite --config vite.config.testBuilder.ts",
     "preview": "vite preview",
-    "postinstall": "node src/scripts/generate-uuid.js"
+    "postinstall": "node src/scripts/generate-uuid.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix"
   },
   "keywords": [
     "testing",
@@ -40,6 +44,7 @@
     "@playwright/test": "^1.54.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.38.0",
     "@heroui/react": "^2.8.1",
     "@heroui/system": "^2.4.19",
     "@heroui/theme": "^2.4.19",
@@ -49,8 +54,14 @@
     "@types/node": "^22.15.18",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.4",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
     "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^9.38.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.0",
     "postcss-prefix-selector": "^2.1.1",
+    "prettier": "^3.6.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tailwindcss": "^4.1.11",

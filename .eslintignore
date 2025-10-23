@@ -1,0 +1,10 @@
+dist/
+node_modules/
+control-panel-build/
+test-builder-build/
+*.log
+.DS_Store
+coverage/
+.nyc_output/
+*.min.js
+*.min.css

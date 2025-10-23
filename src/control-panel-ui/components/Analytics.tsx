@@ -29,7 +29,7 @@ export const Analytics = () => {
       gtag('js', new Date());
 
       gtag('config', 'G-GFX4NHN65L', {
-        user_id: window.ANALYTICS_USER_ID
+        user_id: window.ANALYTICS_USER_ID,
       });
 
       gtag('event', 'app_start');
@@ -37,4 +37,4 @@ export const Analytics = () => {
   }, []);
 
   return null;
-}; 
+};

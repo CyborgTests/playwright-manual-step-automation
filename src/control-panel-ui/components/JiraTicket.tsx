@@ -34,7 +34,7 @@ export default function JiraTicket() {
       try {
         const configured = await (window as any).checkJiraConfig?.();
         setJiraConfigured(configured);
-        
+
         if (configured) {
           const projectKey = await (window as any).getJiraProjectKey?.();
           if (projectKey) {
@@ -58,10 +58,13 @@ export default function JiraTicket() {
       }
 
       try {
-        const types = await (window as any).getJiraIssueTypes?.(ticketData.projectKey);
+        const types = await (window as any).getJiraIssueTypes?.(
+          ticketData.projectKey
+        );
         if (types && types.length > 0) {
           setIssueTypes(types);
-          const defaultType = types.find((t: JiraIssueType) => t.name === 'Bug') || types[0];
+          const defaultType =
+            types.find((t: JiraIssueType) => t.name === 'Bug') || types[0];
           if (defaultType && !ticketData.issueType) {
             setTicketData(prev => ({ ...prev, issueType: defaultType.name }));
           }
@@ -77,16 +80,18 @@ export default function JiraTicket() {
 
   useEffect(() => {
     if (state.testInfo && !ticketData.summary) {
-      const failedSteps = state.steps.filter(step => step.status === 'fail' || step.status === 'warning');
+      const failedSteps = state.steps.filter(
+        step => step.status === 'fail' || step.status === 'warning'
+      );
       const lastFailedStep = failedSteps[failedSteps.length - 1];
-      
+
       const summary = `Test Failed: ${state.testInfo.title}`;
-      
+
       let description = `Test Failure Details\n`;
       description += `Test: ${state.testInfo.title}\n`;
       description += `File: ${state.testInfo.file}\n`;
       description += `Test ID: ${state.testInfo.testId}\n\n`;
-      
+
       if (failedSteps.length > 0) {
         description += `Failed Steps:\n`;
         failedSteps.forEach((step, idx) => {
@@ -98,15 +103,15 @@ export default function JiraTicket() {
         });
         description += '\n';
       }
-      
+
       description += `Steps to Reproduce:\n`;
       state.steps.forEach((step, idx) => {
         description += `${idx + 1}. ${step.text}\n`;
       });
-      
+
       description += `\nExpected Behavior:\n`;
       description += `All test steps should pass\n`;
-      
+
       description += `\nActual Behavior:\n`;
       if (lastFailedStep) {
         description += `Step "${lastFailedStep.text}" failed`;
@@ -114,7 +119,7 @@ export default function JiraTicket() {
           description += `: ${lastFailedStep.reason}`;
         }
       }
-      
+
       setTicketData(prev => ({
         ...prev,
         summary,
@@ -124,7 +129,11 @@ export default function JiraTicket() {
   }, [state.testInfo, state.steps]);
 
   const handleSubmit = async () => {
-    if (!ticketData.summary || !ticketData.projectKey || !ticketData.issueType) {
+    if (
+      !ticketData.summary ||
+      !ticketData.projectKey ||
+      !ticketData.issueType
+    ) {
       return;
     }
 
@@ -133,8 +142,10 @@ export default function JiraTicket() {
 
     let loadingToastId: string | undefined;
     try {
-      const failedSteps = state.steps.filter(step => step.status === 'fail' || step.status === 'warning');
-      
+      const failedSteps = state.steps.filter(
+        step => step.status === 'fail' || step.status === 'warning'
+      );
+
       const ticketInfo = {
         ...ticketData,
         testInfo: state.testInfo,
@@ -143,13 +154,13 @@ export default function JiraTicket() {
       };
 
       loadingToastId = toast.loading('Creating Jira ticket...');
-      
+
       const result = await (window as any).createJiraTicket?.(ticketInfo);
       console.log('Jira API result:', result);
-      
+
       toast.dismiss(loadingToastId);
       loadingToastId = undefined;
-      
+
       if (result?.success) {
         toast.success(`Jira ticket created: ${result.issueKey}`, {
           duration: 4000,
@@ -165,9 +176,12 @@ export default function JiraTicket() {
       if (loadingToastId) {
         toast.dismiss(loadingToastId);
       }
-      toast.error(`Failed to create Jira ticket: ${error instanceof Error ? error.message : 'Unknown error'}`, {
-        duration: 6000,
-      });
+      toast.error(
+        `Failed to create Jira ticket: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        {
+          duration: 6000,
+        }
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -175,7 +189,7 @@ export default function JiraTicket() {
 
   const handleCancel = () => {
     dispatch({ type: 'TOGGLE_JIRA_TICKET' });
-    const defaultType = issueTypes.find((t) => t.name === 'Bug') || issueTypes[0];
+    const defaultType = issueTypes.find(t => t.name === 'Bug') || issueTypes[0];
     setTicketData({
       summary: '',
       description: '',
@@ -190,7 +204,12 @@ export default function JiraTicket() {
         <div className="bg-white rounded-lg p-6 shadow-sm">
           <div className="text-center">
             <div className="text-red-500 mb-4">
-              <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-12 h-12 mx-auto mb-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
                   strokeLinecap="round"
@@ -204,7 +223,9 @@ export default function JiraTicket() {
               Jira integration is not properly configured.
             </p>
             <div className="bg-gray-50 p-4 rounded-lg text-left">
-              <p className="text-sm font-medium mb-2">Required Environment Variables:</p>
+              <p className="text-sm font-medium mb-2">
+                Required Environment Variables:
+              </p>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• JIRA_BASE_URL</li>
                 <li>• JIRA_EMAIL</li>
@@ -227,7 +248,7 @@ export default function JiraTicket() {
     <div className="p-6 w-full max-w-3xl mx-auto">
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <h2 className="text-xl font-semibold mb-6">Create Jira Ticket</h2>
-        
+
         <div className="space-y-5">
           <div className="w-full">
             <Input
@@ -235,67 +256,75 @@ export default function JiraTicket() {
               label="Summary"
               placeholder="Brief description of the issue"
               value={ticketData.summary}
-              onValueChange={(value) => setTicketData((prev) => ({ ...prev, summary: value }))}
+              onValueChange={value =>
+                setTicketData(prev => ({ ...prev, summary: value }))
+              }
               classNames={{
-                input: "text-sm",
-                inputWrapper: "w-full"
+                input: 'text-sm',
+                inputWrapper: 'w-full',
               }}
             />
           </div>
-          
+
           <div className="w-full">
             <Textarea
               label="Description"
               placeholder="Detailed description of the issue"
               value={ticketData.description}
-              onValueChange={(value) => setTicketData((prev) => ({ ...prev, description: value }))}
+              onValueChange={value =>
+                setTicketData(prev => ({ ...prev, description: value }))
+              }
               className="h-32"
               classNames={{
-                input: "text-sm leading-relaxed",
-                inputWrapper: "w-full"
+                input: 'text-sm leading-relaxed',
+                inputWrapper: 'w-full',
               }}
             />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="w-full">
               <Select
                 isRequired
                 label="Issue Type"
-                placeholder={issueTypes.length === 0 ? "Loading..." : "Select issue type"}
-                selectedKeys={ticketData.issueType ? [ticketData.issueType] : []}
-                onSelectionChange={(keys) => {
+                placeholder={
+                  issueTypes.length === 0 ? 'Loading...' : 'Select issue type'
+                }
+                selectedKeys={
+                  ticketData.issueType ? [ticketData.issueType] : []
+                }
+                onSelectionChange={keys => {
                   const issueType = Array.from(keys)[0] as string;
-                  setTicketData((prev) => ({ ...prev, issueType }));
+                  setTicketData(prev => ({ ...prev, issueType }));
                 }}
                 classNames={{
-                  trigger: "w-full"
+                  trigger: 'w-full',
                 }}
                 isDisabled={issueTypes.length === 0}
               >
-                {issueTypes.map((type) => (
-                  <SelectItem key={type.name}>
-                    {type.name}
-                  </SelectItem>
+                {issueTypes.map(type => (
+                  <SelectItem key={type.name}>{type.name}</SelectItem>
                 ))}
               </Select>
             </div>
-            
+
             <div className="w-full">
               <Input
                 isRequired
                 label="Project Key"
                 placeholder="e.g., PROJ"
                 value={ticketData.projectKey}
-                onValueChange={(value) => setTicketData((prev) => ({ ...prev, projectKey: value }))}
+                onValueChange={value =>
+                  setTicketData(prev => ({ ...prev, projectKey: value }))
+                }
                 classNames={{
-                  input: "text-sm uppercase",
-                  inputWrapper: "w-full"
+                  input: 'text-sm uppercase',
+                  inputWrapper: 'w-full',
                 }}
               />
             </div>
           </div>
-          
+
           {state.steps.length > 0 && (
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 w-full">
               <p className="text-sm font-medium text-blue-800 mb-2">
@@ -303,26 +332,39 @@ export default function JiraTicket() {
               </p>
               <div className="text-sm text-blue-600 space-y-1 max-h-48 overflow-y-auto">
                 {state.steps.map((step, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className={`break-words ${step.status === 'fail' ? 'text-red-600 font-medium' : ''}`}
                   >
-                    {idx + 1}. {step.text} {step.status === 'fail' ? '❌' : step.status === 'pass' ? '✓' : ''}
+                    {idx + 1}. {step.text}{' '}
+                    {step.status === 'fail'
+                      ? '❌'
+                      : step.status === 'pass'
+                        ? '✓'
+                        : ''}
                   </div>
                 ))}
               </div>
             </div>
           )}
-          
         </div>
-        
+
         <div className="flex gap-3 mt-6">
-          <Button color="default" variant="bordered" onPress={handleCancel} className="flex-1">
+          <Button
+            color="default"
+            variant="bordered"
+            onPress={handleCancel}
+            className="flex-1"
+          >
             Cancel
           </Button>
           <Button
             color="primary"
-            isDisabled={!ticketData.summary || !ticketData.projectKey || !ticketData.issueType}
+            isDisabled={
+              !ticketData.summary ||
+              !ticketData.projectKey ||
+              !ticketData.issueType
+            }
             isLoading={isSubmitting}
             onPress={handleSubmit}
             className="flex-1"
@@ -334,4 +376,3 @@ export default function JiraTicket() {
     </div>
   );
 }
-

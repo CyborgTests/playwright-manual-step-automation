@@ -4,24 +4,30 @@ import {
   Page,
   expect,
   test as pwTest,
-} from "@playwright/test";
-import { chromium } from "playwright";
-import { config } from "./config";
-import { startServer } from "./utils/server";
-import openInDefaultBrowser from "./utils/openInDefaultBrowser";
+} from '@playwright/test';
+import { chromium } from 'playwright';
+import { config } from './config';
+import { startServer } from './utils/server';
+import openInDefaultBrowser from './utils/openInDefaultBrowser';
 import {
   checkJiraConfig,
   getJiraProjectKey,
   getJiraIssueTypes,
   createJiraTicket,
-} from "./utils/jira";
+} from './utils/jira';
 
 const getFile = async () => {
   const fs = await import('fs/promises');
   const path = await import('path');
-  const testBuilderAppPath = path.resolve(process.cwd(), 'node_modules/@cyborgtests/test/test-builder-build');
+  const testBuilderAppPath = path.resolve(
+    process.cwd(),
+    'node_modules/@cyborgtests/test/test-builder-build'
+  );
 
-  const html = await fs.readFile(path.join(testBuilderAppPath, 'index.html'), 'utf-8');
+  const html = await fs.readFile(
+    path.join(testBuilderAppPath, 'index.html'),
+    'utf-8'
+  );
 
   // extract <script> contents — only inline, not external src
   const script = [...html.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/gi)]
@@ -38,7 +44,7 @@ const getFile = async () => {
 class TestFailedError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "TestFailedError";
+    this.name = 'TestFailedError';
   }
 }
 
@@ -48,7 +54,10 @@ const test = pwTest.extend<{
     browser: Browser;
     context: BrowserContext;
   };
-  manualStep: ((stepName: string, params?: { [key: string]: any }) => Promise<void>) & {
+  manualStep: ((
+    stepName: string,
+    params?: { [key: string]: any }
+  ) => Promise<void>) & {
     soft: (stepName: string, params?: { [key: string]: any }) => Promise<void>;
   };
 }>({
@@ -70,23 +79,26 @@ const test = pwTest.extend<{
         });
 
         const { script, styles } = await getFile();
-        await page.addInitScript(({ script: scriptContent, styles: stylesContent }) => {
-          document.addEventListener('DOMContentLoaded', () => {
-            const rootDiv = document.createElement('div');
-            rootDiv.id = 'cyborg-app';
-            document.body.appendChild(rootDiv);
+        await page.addInitScript(
+          ({ script: scriptContent, styles: stylesContent }) => {
+            document.addEventListener('DOMContentLoaded', () => {
+              const rootDiv = document.createElement('div');
+              rootDiv.id = 'cyborg-app';
+              document.body.appendChild(rootDiv);
 
-            const script = document.createElement('script');
-            script.type = 'module';
-            script.textContent = scriptContent;
-            document.head.appendChild(script);
+              const script = document.createElement('script');
+              script.type = 'module';
+              script.textContent = scriptContent;
+              document.head.appendChild(script);
 
-            const style = document.createElement('style');
-            style.setAttribute('rel', 'stylesheet');
-            style.textContent = stylesContent;
-            document.head.appendChild(style);
-          });
-        }, { script, styles });
+              const style = document.createElement('style');
+              style.setAttribute('rel', 'stylesheet');
+              style.textContent = stylesContent;
+              document.head.appendChild(style);
+            });
+          },
+          { script, styles }
+        );
 
         await tcPage.goto(`http://localhost:${config.uiPort}`);
 
@@ -95,7 +107,9 @@ const test = pwTest.extend<{
         });
 
         await tcPage.evaluate(() => {
-          (window as any).testUtils.openInMainBrowser = (window as any).openInMainBrowser;
+          (window as any).testUtils.openInMainBrowser = (
+            window as any
+          ).openInMainBrowser;
         });
 
         await tcPage.exposeFunction('getTestInfo', () => {
@@ -111,7 +125,7 @@ const test = pwTest.extend<{
             tags: testInfo.tags,
           };
         });
-        
+
         await tcPage.exposeFunction('skipTest', () => {
           if (testInfo.skip) {
             testInfo.skip(true);
@@ -126,13 +140,19 @@ const test = pwTest.extend<{
           return getJiraProjectKey();
         });
 
-        await tcPage.exposeFunction('getJiraIssueTypes', async (projectKey: string) => {
-          return await getJiraIssueTypes(projectKey);
-        });
+        await tcPage.exposeFunction(
+          'getJiraIssueTypes',
+          async (projectKey: string) => {
+            return await getJiraIssueTypes(projectKey);
+          }
+        );
 
-        await tcPage.exposeFunction('createJiraTicket', async (ticketInfo: any) => {
-          return await createJiraTicket(ticketInfo);
-        });
+        await tcPage.exposeFunction(
+          'createJiraTicket',
+          async (ticketInfo: any) => {
+            return await createJiraTicket(ticketInfo);
+          }
+        );
 
         await tcPage.bringToFront();
       }
@@ -146,13 +166,19 @@ const test = pwTest.extend<{
 
     const testControlObj = {
       get page() {
-        throw new Error('testControl.page is not available. Use manualStep() to initialize the control panel.');
+        throw new Error(
+          'testControl.page is not available. Use manualStep() to initialize the control panel.'
+        );
       },
       get browser() {
-        throw new Error('testControl.browser is not available. Use manualStep() to initialize the control panel.');
+        throw new Error(
+          'testControl.browser is not available. Use manualStep() to initialize the control panel.'
+        );
       },
       get context() {
-        throw new Error('testControl.context is not available. Use manualStep() to initialize the control panel.');
+        throw new Error(
+          'testControl.context is not available. Use manualStep() to initialize the control panel.'
+        );
       },
       _getTestControl: getTestControl,
       _initialized: false,
@@ -175,22 +201,31 @@ const test = pwTest.extend<{
     let currentResumeResolver: (() => void) | null = null;
     let resumeFunctionExposed = false;
 
-    const manualStep = async (stepName: string, params: { isSoft?: boolean; [key: string]: any } = {}) => {
+    const manualStep = async (
+      stepName: string,
+      params: { isSoft?: boolean; [key: string]: any } = {}
+    ) => {
       test.setTimeout(0);
       return await test.step(
         `✋ [MANUAL] ${stepName}`,
         async () => {
           const tc = await (testControl as any)._getTestControl();
           (testControl as any)._initialized = true;
-          
+
           await tc.page.evaluate(
-            ({ stepName, params }: { stepName: string; params: { isSoft?: boolean; [key: string]: any } }) => {
+            ({
+              stepName,
+              params,
+            }: {
+              stepName: string;
+              params: { isSoft?: boolean; [key: string]: any };
+            }) => {
               (window as any).testUtils?.addStep(stepName, params);
             },
             { stepName, params }
           );
 
-          const resumePromise = new Promise<void>((resolve) => {
+          const resumePromise = new Promise<void>(resolve => {
             currentResumeResolver = resolve;
           });
 
@@ -232,7 +267,10 @@ const test = pwTest.extend<{
         { box: true, timeout: 0 }
       );
     };
-    manualStep.soft = async (stepName: string, params: { [key: string]: any } = {}) =>
+    manualStep.soft = async (
+      stepName: string,
+      params: { [key: string]: any } = {}
+    ) =>
       await test.step(
         `✋ [MANUAL][SOFT] ${stepName}`,
         async () => {
@@ -243,7 +281,12 @@ const test = pwTest.extend<{
               type: 'softFail',
               description: `Soft fail in manual step: ${(err as Error).message}`,
             });
-            await expect.soft(false, `Soft fail in manual step: ${(err as Error).message}`).toBeTruthy();
+            await expect
+              .soft(
+                false,
+                `Soft fail in manual step: ${(err as Error).message}`
+              )
+              .toBeTruthy();
             console.warn(`Soft fail in manual step: ${stepName}`, err);
           }
         },

@@ -2,7 +2,12 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 
 interface RecordedElement {
   selector: string;
-  eventType: 'click' | 'keydown' | 'should-exists' | 'should-not-exist' | 'focus';
+  eventType:
+    | 'click'
+    | 'keydown'
+    | 'should-exists'
+    | 'should-not-exist'
+    | 'focus';
   data?: {
     text?: string;
     mightNavigate?: boolean;
@@ -27,21 +32,29 @@ const initialState: EventRecorderState = {
   isRecording: false,
 };
 
-const eventRecorderReducer = (state: EventRecorderState, action: EventRecorderAction): EventRecorderState => {
+const eventRecorderReducer = (
+  state: EventRecorderState,
+  action: EventRecorderAction
+): EventRecorderState => {
   switch (action.type) {
     case 'ADD_ELEMENT': {
       console.log('state', state);
       const element = action.payload;
       if (state.recordedElements.length > 0) {
-        const lastElement = state.recordedElements[state.recordedElements.length - 1];
-        if (lastElement.eventType === 'keydown' && element.eventType === 'keydown' && lastElement.selector === element.selector) {
+        const lastElement =
+          state.recordedElements[state.recordedElements.length - 1];
+        if (
+          lastElement.eventType === 'keydown' &&
+          element.eventType === 'keydown' &&
+          lastElement.selector === element.selector
+        ) {
           const updatedElements = [...state.recordedElements];
           updatedElements[updatedElements.length - 1] = {
             ...lastElement,
             data: {
               ...lastElement.data,
-              text: element.data?.text
-            }
+              text: element.data?.text,
+            },
           };
           return {
             ...state,
@@ -82,12 +95,16 @@ interface EventRecorderContextType {
   loadFromStorage: () => void;
 }
 
-const EventRecorderContext = createContext<EventRecorderContextType | undefined>(undefined);
+const EventRecorderContext = createContext<
+  EventRecorderContextType | undefined
+>(undefined);
 
 export const useEventRecorder = () => {
   const context = useContext(EventRecorderContext);
   if (!context) {
-    throw new Error('useEventRecorder must be used within an EventRecorderProvider');
+    throw new Error(
+      'useEventRecorder must be used within an EventRecorderProvider'
+    );
   }
   return context;
 };
@@ -96,7 +113,9 @@ interface EventRecorderProviderProps {
   children: React.ReactNode;
 }
 
-export const EventRecorderProvider: React.FC<EventRecorderProviderProps> = ({ children }) => {
+export const EventRecorderProvider: React.FC<EventRecorderProviderProps> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(eventRecorderReducer, initialState);
 
   const addElement = (element: RecordedElement) => {
@@ -129,7 +148,10 @@ export const EventRecorderProvider: React.FC<EventRecorderProviderProps> = ({ ch
 
   useEffect(() => {
     if (state.recordedElements.length === 0) return;
-    localStorage.setItem('eventRecorderElements', JSON.stringify(state.recordedElements));
+    localStorage.setItem(
+      'eventRecorderElements',
+      JSON.stringify(state.recordedElements)
+    );
   }, [state.recordedElements]);
 
   useEffect(() => {
@@ -149,4 +171,4 @@ export const EventRecorderProvider: React.FC<EventRecorderProviderProps> = ({ ch
       {children}
     </EventRecorderContext.Provider>
   );
-}; 
+};

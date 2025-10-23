@@ -17,7 +17,11 @@ export default function Header() {
         <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
           <NavbarBrand as="li" className="gap-3 max-w-fit">
             <div className="flex justify-start items-center gap-1">
-              <img src="./logo.svg" alt="Cyborg Logo" className="min-w-10 dark:invert" />
+              <img
+                src="./logo.svg"
+                alt="Cyborg Logo"
+                className="min-w-10 dark:invert"
+              />
             </div>
           </NavbarBrand>
         </NavbarContent>
@@ -25,4 +29,4 @@ export default function Header() {
       </Navbar>
     </Fragment>
   );
-} 
+}

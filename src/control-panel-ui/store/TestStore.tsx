@@ -28,7 +28,10 @@ const initialState: State = {
 export type Action =
   | { type: 'SET_TEST_NAME'; payload: string }
   | { type: 'SET_TEST_INFO'; payload: InjectedTestInfo }
-  | { type: 'ADD_STEP'; payload: { step: string; isSoft?: boolean; data?: Record<string, any> } }
+  | {
+      type: 'ADD_STEP';
+      payload: { step: string; isSoft?: boolean; data?: Record<string, any> };
+    }
   | { type: 'PASS_STEP' }
   | { type: 'FAIL_STEP'; payload: string }
   | { type: 'SKIP_STEP' }
@@ -43,12 +46,15 @@ function reducer(state: State, action: Action): State {
     case 'ADD_STEP':
       return {
         ...state,
-        steps: [...state.steps, { 
-          text: action.payload.step, 
-          status: 'pending', 
-          isSoft: action.payload.isSoft,
-          data: action.payload.data
-        }],
+        steps: [
+          ...state.steps,
+          {
+            text: action.payload.step,
+            status: 'pending',
+            isSoft: action.payload.isSoft,
+            data: action.payload.data,
+          },
+        ],
       };
     case 'PASS_STEP': {
       const steps = [...state.steps];
@@ -90,10 +96,13 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-const TestStoreContext = createContext<{
-  state: State;
-  dispatch: Dispatch<Action>;
-} | undefined>(undefined);
+const TestStoreContext = createContext<
+  | {
+      state: State;
+      dispatch: Dispatch<Action>;
+    }
+  | undefined
+>(undefined);
 
 // Create a single store instance
 const store = {
@@ -106,15 +115,17 @@ const store = {
   subscribe: (listener: (state: State) => void) => {
     store.listeners.add(listener);
     return () => store.listeners.delete(listener);
-  }
+  },
 };
 
 export function TestStoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = React.useState(store.state);
-  
+
   React.useEffect(() => {
     const unsubscribe = store.subscribe(setState);
-    return () => { unsubscribe(); };
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -130,4 +141,4 @@ export function useTestStore() {
     throw new Error('useTestStore must be used within a TestStoreProvider');
   }
   return context;
-} 
+}

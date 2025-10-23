@@ -1,5 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from '@heroui/react';
 
 interface ContextMenuProps {
   isVisible: boolean;
@@ -19,7 +24,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   position,
   onAction,
   onClose,
-  targetElement
+  targetElement,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +37,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 
     if (isVisible) {
       document.addEventListener('click', handleClickOutside);
-      document.addEventListener('keydown', (e) => {
+      document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
           onClose();
         }
@@ -48,7 +53,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     { text: 'Should Exist', action: 'should-exists' },
     { text: 'Should Not Exist', action: 'should-not-exist' },
     { text: 'Focus', action: 'focus' },
-    { text: 'Click', action: 'click' }
+    { text: 'Click', action: 'click' },
   ];
 
   const handleAction = (action: string) => {
@@ -66,26 +71,26 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       className="fixed z-[10001]"
       style={{
         left: position.x,
-        top: position.y
+        top: position.y,
       }}
     >
-      <Dropdown isOpen={isVisible} onOpenChange={(open) => !open && onClose()} portalContainer={document.getElementById('cyborg-app') as HTMLElement}>
+      <Dropdown
+        isOpen={isVisible}
+        onOpenChange={open => !open && onClose()}
+        portalContainer={document.getElementById('cyborg-app') as HTMLElement}
+      >
         <DropdownTrigger>
           <div className="w-0 h-0" />
         </DropdownTrigger>
         <DropdownMenu
           aria-label="Context menu"
-          onAction={(key) => handleAction(key as string)}
+          onAction={key => handleAction(key as string)}
           classNames={{
-            list: "m-0"
+            list: 'm-0',
           }}
         >
-          {menuItems.map((item) => (
-            <DropdownItem
-              key={item.action}
-            >
-              {item.text}
-            </DropdownItem>
+          {menuItems.map(item => (
+            <DropdownItem key={item.action}>{item.text}</DropdownItem>
           ))}
         </DropdownMenu>
       </Dropdown>
@@ -93,4 +98,4 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   );
 };
 
-export default ContextMenu; 
+export default ContextMenu;

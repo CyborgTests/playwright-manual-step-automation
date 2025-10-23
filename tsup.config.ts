@@ -6,7 +6,7 @@ export default defineConfig({
   outExtension({ format }) {
     return {
       js: format === 'esm' ? '.mjs' : '.cjs',
-    }
+    };
   },
   dts: true,
   sourcemap: true,
@@ -25,5 +25,5 @@ export default defineConfig({
     'chromium-bidi',
     'chromium-bidi/lib/cjs/bidiMapper/BidiMapper',
     'chromium-bidi/lib/cjs/cdp/CdpConnection',
-  ]
+  ],
 });

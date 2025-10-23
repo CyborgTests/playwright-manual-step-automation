@@ -1,6 +1,6 @@
 # 🤖 Cyborg Tests Guidelines v0.1
 
-Welcome to Cyborg Tests! 🎉 This guide is your perfect starting point for understanding how to seamlessly integrate Cyborg Tests into your testing activities — whether it's regression, acceptance, smoke testing, daily runs, or any other testing scenario.  
+Welcome to Cyborg Tests! 🎉 This guide is your perfect starting point for understanding how to seamlessly integrate Cyborg Tests into your testing activities — whether it's regression, acceptance, smoke testing, daily runs, or any other testing scenario.
 
 We encourage you to adapt, extend, and modify these guidelines to fit your unique workflow. Your testing journey is unique, and Cyborg Tests is here to support it!
 
@@ -27,10 +27,10 @@ This enables you to create **hybrid test flows** that are partly automated and p
 ### Quick Example
 
 ```ts
-test("video call quality", async ({ page }) => {
-  await page.goto("/video-call");
-  await manualStep("Check if video/audio quality looks fine to the human eye");
-  await page.click("text=End Call");
+test('video call quality', async ({ page }) => {
+  await page.goto('/video-call');
+  await manualStep('Check if video/audio quality looks fine to the human eye');
+  await page.click('text=End Call');
 });
 ```
 
@@ -39,10 +39,11 @@ test("video call quality", async ({ page }) => {
 ✅ **Fully compatible** with your existing Playwright codebase  
 ✅ **Version controlled** — treat them just like your automated tests  
 ✅ **Perfect for QA engineers** to cover test cases that are:
-  - **Impossible to automate** (visual quality checks, accessibility reviews, user experience validation)
-  - **Too expensive or complex** to fully automate right now
-  - **Not yet automated** due to resource, budget, or time constraints
-  - **Require human judgment** (subjective assessments, exploratory scenarios)
+
+- **Impossible to automate** (visual quality checks, accessibility reviews, user experience validation)
+- **Too expensive or complex** to fully automate right now
+- **Not yet automated** due to resource, budget, or time constraints
+- **Require human judgment** (subjective assessments, exploratory scenarios)
 
 ### Installation
 
@@ -55,27 +56,27 @@ npm install @cyborgtests/test
 Then import it in your test files:
 
 ```ts
-import test from "@cyborgtests/test";
+import test from '@cyborgtests/test';
 ```
+
 This is an extended original test that now allows you to use `manualStep()` function:
 
 ```ts
-test(
-  "product details page should be displayed correctly",
-  async ({ page, manualStep }) => {
-    // Automated step
-    await page.goto("/product/cherry-tomatoes");
-    // Manual steps
-    await manualStep(`Verify that product details are displayed correctly - 
+test('product details page should be displayed correctly', async ({
+  page,
+  manualStep,
+}) => {
+  // Automated step
+  await page.goto('/product/cherry-tomatoes');
+  // Manual steps
+  await manualStep(`Verify that product details are displayed correctly - 
       CHERRY TOMATOES
       cherry tomatoes, salt, sugar, greens, acetic acid, garlic, spices
       `);
-    await manualStep(`Verify that product price is displayed correctly - $95`);
-    await manualStep("Verify that product image is displayed correctly");
-  }
-);
+  await manualStep(`Verify that product price is displayed correctly - $95`);
+  await manualStep('Verify that product image is displayed correctly');
+});
 ```
-
 
 ⸻
 
@@ -88,37 +89,42 @@ Running your Cyborg tests is just like running regular Playwright tests, with on
 You can start your Cyborg tests using any of these familiar methods:
 
 #### Command Line Interface (CLI)
+
 ```bash
 npx playwright test --workers=1 --timeout=0
 ```
 
 #### Playwright UI Mode
+
 ```bash
 npx playwright test --ui
 ```
 
 #### IDE Extensions
+
 Use the [Playwright VS Code extension](https://playwright.dev/docs/getting-started-vscode) for an integrated development experience.
 
 ### Important Configuration Rules
 
 #### 🚫 Disable Parallelization
+
 Run tests sequentially to avoid confusion with multiple manual steps:
+
 ```bash
 --workers=1
 ```
-*You probably don't want to handle multiple manual steps simultaneously, right?* 😉
+
+_You probably don't want to handle multiple manual steps simultaneously, right?_ 😉
 
 #### ⏰ Adjust Timeouts
+
 Increase or disable timeouts since manual actions take longer than automated ones:
+
 ```bash
 --timeout=0  # Disables test-level timeout completely
 ```
 
 By default, Playwright has a 30-second timeout, which works great for automated tests but isn't sufficient for human decision-making. Learn more about [timeout configuration](https://playwright.dev/docs/test-cli#:~:text=%2D%2Dtimeout%20%3Ctimeout%3E,default%3A%2030%20seconds).
-
-
-
 
 ⸻
 
@@ -136,14 +142,14 @@ We **highly recommend** enabling visual artifacts for your Cyborg test runs. Thi
 // playwright.config.ts
 export default defineConfig({
   reporters: [
-    ["html", { open: "never" }], // Generate HTML report
-    ["blob"], // For report merging (if using report server)
+    ['html', { open: 'never' }], // Generate HTML report
+    ['blob'], // For report merging (if using report server)
   ],
   use: {
-    trace: "retain-on-failure",
-    video: "retain-on-failure", 
+    trace: 'retain-on-failure',
+    video: 'retain-on-failure',
     screenshot: {
-      mode: "retain-on-failure",
+      mode: 'retain-on-failure',
       fullPage: true,
     },
   },
@@ -155,6 +161,7 @@ export default defineConfig({
 ⚠️ **Important**: Each test execution will override previous results by default.
 
 **To preserve results:**
+
 - **Copy** the `test-results` folder after each run
 - **Use a report server** (see section 5) for centralized storage
 - **Archive important runs** with meaningful names
@@ -186,9 +193,9 @@ First, create a centralized file to manage your team assignments:
 ```ts
 // tags.ts
 export const OWNER = {
-  ALEX_HOT: "@alexhot",
-  BILL_GATES: "@billgates",
-  SAM_ALTMAN: "@sam_altman",
+  ALEX_HOT: '@alexhot',
+  BILL_GATES: '@billgates',
+  SAM_ALTMAN: '@sam_altman',
 };
 ```
 
@@ -196,22 +203,22 @@ Then assign tests to specific team members:
 
 ```ts
 // cart.cyborg.test.ts
-import test from "@cyborgtests/test";
-import { OWNER } from "../tags";
+import test from '@cyborgtests/test';
+import { OWNER } from '../tags';
 
 test(
-  "shopping cart quantity update",
+  'shopping cart quantity update',
   {
-    tag: [OWNER.ALEX_HOT, "@CYBORG"],
+    tag: [OWNER.ALEX_HOT, '@CYBORG'],
   },
   async ({ page, manualStep }) => {
-    await page.goto("/cart");
+    await page.goto('/cart');
     await manualStep(
-      "In the shopping cart, locate a product with a quantity selector"
+      'In the shopping cart, locate a product with a quantity selector'
     );
-    await manualStep("Change the quantity value");
+    await manualStep('Change the quantity value');
     await manualStep(
-      "Verify the cart updates to reflect the new quantity and recalculates the total price accordingly"
+      'Verify the cart updates to reflect the new quantity and recalculates the total price accordingly'
     );
   }
 );
@@ -228,14 +235,14 @@ import { execSync } from 'child_process';
 export default defineConfig({
   projects: [
     {
-      name: "cyborg-tests",
+      name: 'cyborg-tests',
       grep: new RegExp(
-        process.env.QA_USERNAME || 
-        execSync('git config user.name', { encoding: 'utf8' }).trim() || 
-        ""
+        process.env.QA_USERNAME ||
+          execSync('git config user.name', { encoding: 'utf8' }).trim() ||
+          ''
       ),
       use: {
-        ...devices["Desktop Chrome"],
+        ...devices['Desktop Chrome'],
       },
     },
   ],
@@ -286,11 +293,15 @@ This setup makes it incredibly easy to **gradually evolve your testing strategy*
 Always tag tests that contain manual steps:
 
 ```ts
-test("shopping cart quantity update", { 
-  tag: [OWNER.ALEX_HOT, "@CYBORG"] 
-}, async ({ page, manualStep }) => {
-  // Your test logic here
-});
+test(
+  'shopping cart quantity update',
+  {
+    tag: [OWNER.ALEX_HOT, '@CYBORG'],
+  },
+  async ({ page, manualStep }) => {
+    // Your test logic here
+  }
+);
 ```
 
 #### Separate Automated and Manual Runs
@@ -303,15 +314,15 @@ export default defineConfig({
   projects: [
     // For CI/automated runs - exclude manual tests
     {
-      name: "automated",
-      grepInvert: new RegExp("@CYBORG"),
-      use: { ...devices["Desktop Chrome"] },
+      name: 'automated',
+      grepInvert: new RegExp('@CYBORG'),
+      use: { ...devices['Desktop Chrome'] },
     },
-    // For manual QA sessions - include manual tests  
+    // For manual QA sessions - include manual tests
     {
-      name: "cyborg",
-      grep: new RegExp("@CYBORG"),
-      use: { ...devices["Desktop Chrome"] },
+      name: 'cyborg',
+      grep: new RegExp('@CYBORG'),
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
 });
@@ -322,11 +333,13 @@ export default defineConfig({
 You have flexibility in how you structure your tests:
 
 **Option 1: Mixed files** (good for related test cases)
+
 ```
 cart.test.ts  // Contains both automated and manual tests
 ```
 
 **Option 2: Separate files** (good for clear separation)
+
 ```
 cart.test.ts        // Automated tests only
 cart.cyborg.test.ts // Manual/hybrid tests only
@@ -348,10 +361,13 @@ Want a **single comprehensive report** combining all your automated and manual t
 // playwright.config.ts
 export default defineConfig({
   reporters: [
-    ["blob"], // Required for report merging
-    ["@cyborgtests/reporter-playwright-reports-server", {
-      serverUrl: "http://your-reports-server.com"
-    }],
+    ['blob'], // Required for report merging
+    [
+      '@cyborgtests/reporter-playwright-reports-server',
+      {
+        serverUrl: 'http://your-reports-server.com',
+      },
+    ],
   ],
 });
 ```
@@ -359,12 +375,10 @@ export default defineConfig({
 #### The Unified Workflow
 
 1. **CI runs automated tests** → Results published to server
-2. **QA team runs manual tests** → Results published to server  
+2. **QA team runs manual tests** → Results published to server
 3. **Generate combined report** → Single HTML report with all results
 
 This gives you the complete picture of your application's quality! 📊
-
-
 
 ⸻
 
@@ -375,33 +389,43 @@ This gives you the complete picture of your application's quality! 📊
 Take advantage of Playwright's powerful annotation system to make your Cyborg tests even more informative:
 
 #### Using Tags for Organization
+
 ```ts
-test("payment flow validation", {
-  tag: ["@CYBORG", "@payment", "@critical", "@regression"]
-}, async ({ page, manualStep }) => {
-  // Your test logic
-});
+test(
+  'payment flow validation',
+  {
+    tag: ['@CYBORG', '@payment', '@critical', '@regression'],
+  },
+  async ({ page, manualStep }) => {
+    // Your test logic
+  }
+);
 ```
 
 **Use tags when you want to:**
+
 - **Filter tests** (by feature, owner, severity, etc.)
 - **Group related tests** for execution
 - **Organize test suites** by domain or priority
 
 #### Using Annotations for Context
+
 ```ts
-test("complex user journey", async ({ page, manualStep }) => {
-  test.info().annotations.push(
-    { type: "issue", description: "https://jira.company.com/PROJ-123" },
-    { type: "documentation", description: "See user guide section 4.2" },
-    { type: "note", description: "Pay special attention to loading states" }
-  );
-  
+test('complex user journey', async ({ page, manualStep }) => {
+  test
+    .info()
+    .annotations.push(
+      { type: 'issue', description: 'https://jira.company.com/PROJ-123' },
+      { type: 'documentation', description: 'See user guide section 4.2' },
+      { type: 'note', description: 'Pay special attention to loading states' }
+    );
+
   // Your test logic
 });
 ```
 
 **Use annotations to provide:**
+
 - **Links to requirements** or user stories
 - **References to bug reports** or issues
 - **Special instructions** for testers
@@ -416,23 +440,25 @@ test("complex user journey", async ({ page, manualStep }) => {
 import { LoginPage } from '../pages/LoginPage';
 import { ShoppingCartPage } from '../pages/ShoppingCartPage';
 
-// Reuse API helpers  
+// Reuse API helpers
 import { createTestUser, setupTestData } from '../helpers/api';
 
-test("end-to-end checkout flow", async ({ page, manualStep }) => {
+test('end-to-end checkout flow', async ({ page, manualStep }) => {
   // Use existing API setup
   const user = await createTestUser();
   await setupTestData(user.id);
-  
+
   // Use existing page objects
   const loginPage = new LoginPage(page);
   await loginPage.login(user.email, user.password);
-  
+
   const cartPage = new ShoppingCartPage(page);
-  await cartPage.addProductToCart("premium-widget");
-  
+  await cartPage.addProductToCart('premium-widget');
+
   // Add manual verification where automation falls short
-  await manualStep("Verify the checkout form displays correct tax calculations for your region");
+  await manualStep(
+    'Verify the checkout form displays correct tax calculations for your region'
+  );
 });
 ```
 
@@ -442,16 +468,22 @@ test("end-to-end checkout flow", async ({ page, manualStep }) => {
 
 ```ts
 // ❌ Vague and unhelpful
-await manualStep("Check if everything looks good");
+await manualStep('Check if everything looks good');
 
 // ✅ Clear and specific
-await manualStep("Verify the product image displays correctly and matches the product title");
+await manualStep(
+  'Verify the product image displays correctly and matches the product title'
+);
 
 // ✅ Include context and expected outcome
-await manualStep("Click the 'Apply Discount' button and confirm the total price updates to show the 10% discount");
+await manualStep(
+  "Click the 'Apply Discount' button and confirm the total price updates to show the 10% discount"
+);
 
 // ✅ Provide guidance for edge cases
-await manualStep("Test the search functionality with special characters (e.g., '@', '#', '&') - results should handle these gracefully without errors");
+await manualStep(
+  "Test the search functionality with special characters (e.g., '@', '#', '&') - results should handle these gracefully without errors"
+);
 ```
 
 ### Performance Considerations
@@ -471,7 +503,6 @@ await manualStep("Test the search functionality with special characters (e.g., '
 - **Share innovative use cases** on our Discord community
 - **Report issues and suggest improvements** on GitHub
 - **Help other teams** by documenting your lessons learned
-
 
 **Happy testing with Cyborg Tests!** 🤖✨
 

@@ -6,15 +6,11 @@ export default function TestInfo() {
   const { state } = useTestStore();
   const testInfo = state.testInfo;
   const [showAnnotations, setShowAnnotations] = useState(false);
-  
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <img 
-          src={logoSvg} 
-          alt="Cyborg Tests Logo" 
-          className="h-8 w-auto"
-        />
+        <img src={logoSvg} alt="Cyborg Tests Logo" className="h-8 w-auto" />
       </div>
 
       <div>
@@ -25,9 +21,7 @@ export default function TestInfo() {
       </div>
 
       {testInfo?.file && (
-        <p className="text-gray-400 text-sm font-sans">
-          {testInfo.file}
-        </p>
+        <p className="text-gray-400 text-sm font-sans">{testInfo.file}</p>
       )}
 
       {testInfo?.tags && testInfo.tags.length > 0 && (
@@ -45,13 +39,13 @@ export default function TestInfo() {
 
       {testInfo?.annotations && testInfo.annotations.length > 0 && (
         <div>
-          <button 
+          <button
             onClick={() => setShowAnnotations(!showAnnotations)}
             className="text-blue-600 text-sm font-medium hover:text-blue-800 transition-colors"
           >
             {showAnnotations ? 'Hide annotations' : 'Show annotations'}
           </button>
-          
+
           {showAnnotations && (
             <div className="mt-2 p-3 bg-gray-50 rounded-lg">
               <div className="space-y-2">
@@ -68,4 +62,4 @@ export default function TestInfo() {
       )}
     </div>
   );
-} 
+}

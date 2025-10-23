@@ -15,6 +15,7 @@ When a manual step is hit, a separate window appears showing the step descriptio
 ## 🤖 Demo
 
 See full tutorial on how Cyborg Test turns manual steps into streamlined Playwright tests:
+
 <p align="center">
     <a href="https://www.youtube.com/watch?v=QLSjvs11Oyw" target="_blank">
       <img src="./readme-assets/keenethics-video-preview.png" 
@@ -68,6 +69,7 @@ await manualStep.soft('This is a soft manual step'); // Test continues if this s
 ## 📊 Analytics Configuration
 
 Google Analytics is enabled by default to help us understand usage. The following data is collected:
+
 - Unique user ID (generated on first run)
 - Test execution events (start of the test)
 - Test results (passed/failed)
@@ -82,7 +84,7 @@ To turn off analytics, use the following configuration:
 import { config } from '@cyborgtests/test';
 
 config.setConfig({
-  analyticsEnabled: false
+  analyticsEnabled: false,
 });
 ```
 
@@ -91,6 +93,7 @@ config.setConfig({
 We welcome contributions! If you'd like to report a bug, request a feature, or submit a pull request, check out our [contributing guidelines](./CONTRIBUTING.md).
 
 ---
+
 <p align="center">
   ⭐️ Found this useful? Star the repo to support the project!
 </p>

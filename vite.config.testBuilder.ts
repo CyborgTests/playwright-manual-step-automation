@@ -16,10 +16,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src')
-    }
+      '@': resolve(__dirname, './src'),
+    },
   },
   server: {
-    port: 3001
-  }
+    port: 3001,
+  },
 });

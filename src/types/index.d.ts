@@ -34,10 +34,13 @@ declare global {
     getTestInfo: () => Promise<InjectedTestInfo>;
     skipTest: () => void;
     testUtils?: {
-      addStep: (step: string, params?: { isSoft?: boolean; [key: string]: any }) => void;
+      addStep: (
+        step: string,
+        params?: { isSoft?: boolean; [key: string]: any }
+      ) => void;
       resumeTest: () => void;
       hasFailed?: boolean;
       failedReason?: string;
     };
   }
-} 
+}

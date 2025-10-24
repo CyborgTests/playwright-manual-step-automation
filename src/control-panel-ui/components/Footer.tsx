@@ -1,8 +1,12 @@
-import React from 'react';
 import { Button } from '@heroui/react';
+import React from 'react';
+import FeedbackPopup from '../../ui/components/FeedbackPopup';
+import { useFeedbackPopup } from '../../ui/hooks/useFeedbackPopup';
 import { trackEvent } from '../../utils/analytics';
 
 export default function Footer() {
+  const { showPopup, closePopup, setShowPopup } = useFeedbackPopup();
+
   const trackButtonClick = (buttonName: string) => {
     trackEvent(`app_${buttonName}_click`);
   };
@@ -25,7 +29,12 @@ export default function Footer() {
           variant="light"
           size="sm"
           title="Source code link"
-          onPress={() => handleButtonClick('https://github.com/CyborgTests/cyborg-test', 'github')}
+          onPress={() =>
+            handleButtonClick(
+              'https://github.com/CyborgTests/cyborg-test',
+              'github'
+            )
+          }
         >
           Github
         </Button>
@@ -34,11 +43,26 @@ export default function Footer() {
           variant="light"
           size="sm"
           title="Discord community"
-          onPress={() => handleButtonClick('https://discord.com/invite/rNZCd3MHDx', 'discord')}
+          onPress={() =>
+            handleButtonClick(
+              'https://discord.com/invite/rNZCd3MHDx',
+              'discord'
+            )
+          }
         >
           Discord
         </Button>
+        <Button
+          className="text-primary"
+          variant="light"
+          size="sm"
+          title="Feedback"
+          onPress={() => setShowPopup(true)}
+        >
+          Feedback
+        </Button>
       </div>
+      {<FeedbackPopup isOpen={showPopup} onClose={closePopup} />}
     </footer>
   );
-} 
+}

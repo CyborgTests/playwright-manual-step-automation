@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import packageJson from '../../../package.json';
 
 const NODE_ENV = process.env.NODE_ENV;
 
@@ -29,9 +30,14 @@ export const Analytics = () => {
 
       gtag('config', 'G-GFX4NHN65L', {
         user_id: window.ANALYTICS_USER_ID,
+        custom_map: {
+          dimension1: 'app_version',
+        },
       });
 
-      gtag('event', 'app_start');
+      gtag('event', 'app_start', {
+        app_version: packageJson.version,
+      });
     }
   }, []);
 

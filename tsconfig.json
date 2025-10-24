@@ -8,6 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "jsx": "react",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "moduleResolution": "node"

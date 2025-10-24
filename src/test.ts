@@ -8,6 +8,11 @@ import {
 import { chromium } from 'playwright';
 import { config } from './config';
 import {
+  getFeedbackState,
+  incrementRunCount,
+  markFeedbackSent,
+} from './utils/feedbackStorage';
+import {
   checkJiraConfig,
   createJiraTicket,
   getJiraIssueTypes,
@@ -153,6 +158,19 @@ const test = pwTest.extend<{
             return await createJiraTicket(ticketInfo);
           }
         );
+
+        await tcPage.exposeFunction('getFeedbackSent', () => {
+          const state = getFeedbackState();
+          return state.feedbackSent;
+        });
+
+        await tcPage.exposeFunction('incrementRunCount', () => {
+          return incrementRunCount();
+        });
+
+        await tcPage.exposeFunction('markFeedbackSent', () => {
+          markFeedbackSent();
+        });
 
         await tcPage.bringToFront();
       }

@@ -11,6 +11,7 @@ const htmlPath = path.join(
   'control-panel-build',
   'index.html'
 );
+const idFilePath = path.join(rootDir, '.analytics-id');
 
 // Generate simple UUID-like ID: timestamp + random hex
 function generateId() {
@@ -21,8 +22,26 @@ function generateId() {
   );
 }
 
+function getOrCreateId() {
+  try {
+    if (fs.existsSync(idFilePath)) {
+      return fs.readFileSync(idFilePath, 'utf-8').trim();
+    }
+  } catch (err) {
+    console.warn('Failed to read existing analytics ID:', err);
+  }
+
+  const newId = generateId();
+  try {
+    fs.writeFileSync(idFilePath, newId, 'utf-8');
+  } catch (err) {
+    console.warn('Failed to save analytics ID:', err);
+  }
+  return newId;
+}
+
 try {
-  const id = generateId();
+  const id = getOrCreateId();
 
   // Inject analytics ID into HTML
   if (fs.existsSync(htmlPath)) {

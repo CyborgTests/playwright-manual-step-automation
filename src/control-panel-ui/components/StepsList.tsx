@@ -2,11 +2,19 @@ import { Button, Input } from '@heroui/react';
 import { useTestStore } from '../store/TestStore';
 import React, { useState } from 'react';
 import { trackEvent } from '../../utils/analytics';
+import ConfirmationDialog from './ConfirmationDialog';
+
+export type ConfirmationType = 'fail' | 'skip' | null;
 
 export default function StepsList() {
   const { state, dispatch } = useTestStore();
   const [comments, setComments] = useState<string[]>(new Array(state.steps.length).fill(''));
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [confirmationType, setConfirmationType] = useState<ConfirmationType>(null);
+  const [pendingStepIndex, setPendingStepIndex] = useState<number | null>(null);
+  const [failureReason, setFailureReason] = useState('');
 
   if (state.steps.length === 0) {
     return null;
@@ -22,27 +30,68 @@ export default function StepsList() {
     trackEvent(`app_${buttonName}_click`);
   };
 
-  const handleStepAction = (stepIndex: number, action: 'pass' | 'fail' | 'skip') => {
+  const openConfirmationDialog = (stepIndex: number, action: 'fail' | 'skip') => {
     const step = state.steps[stepIndex];
     if (step.status !== 'pending') return;
+
+    setPendingStepIndex(stepIndex);
+    setConfirmationType(action);
+    setConfirmationOpen(true);
+    trackEvent(`confirmation_${action}_opened`);
+
+    setFailureReason(comments[stepIndex] || '');
+  };
+
+  const handleConfirmAction = () => {
+    if (pendingStepIndex === null || confirmationType === null) return;
+
+    const step = state.steps[pendingStepIndex];
+    if (step.status !== 'pending') return;
+
+    if (confirmationType === 'fail') {
+      const reason = failureReason || 'Failure reason not provided';
+      dispatch({ type: 'FAIL_STEP', payload: reason });
+      (window as any).testUtils.hasFailed = true;
+      (window as any).testUtils.failedReason = reason;
+      (window as any).testUtils?.resumeTest?.();
+      trackButtonClick('fail_step');
+      trackEvent('confirmation_failed');
+    } else if (confirmationType === 'skip') {
+      dispatch({ type: 'SKIP_STEP' });
+      (window as any).testUtils?.resumeTest?.();
+      trackButtonClick('skip_step');
+      trackEvent('confirmation_skipped');
+    }
+
+    setConfirmationOpen(false);
+    setConfirmationType(null);
+    setPendingStepIndex(null);
+    setFailureReason('');
+  };
+
+  const handleCancelAction = () => {
+    if (confirmationType) {
+      trackEvent(`confirmation_${confirmationType}_cancelled`);
+    }
+    setConfirmationOpen(false);
+    setConfirmationType(null);
+    setPendingStepIndex(null);
+    setFailureReason('');
+  };
+
+  const handleStepAction = (stepIndex: number, action: 'pass' | 'fail' | 'skip') => {
+    const step = state.steps[stepIndex];
+    if (step.status !== 'pending') {
+      return;
+    }
 
     if (action === 'pass') {
       dispatch({ type: 'PASS_STEP' });
       (window as any).testUtils?.resumeTest?.();
       trackButtonClick('pass_step');
-    } else if (action === 'fail') {
-      dispatch({ type: 'FAIL_STEP', payload: comments[stepIndex] || 'No failure reason provided' });
-      (window as any).testUtils.hasFailed = true;
-      (window as any).testUtils.failedReason = comments[stepIndex] || 'No failure reason provided';
-      (window as any).testUtils?.resumeTest?.();
-      trackButtonClick('fail_step');
-    } else if (action === 'skip') {
-      dispatch({ type: 'SKIP_STEP' });
-      (window as any).skipTest?.();
-      trackButtonClick('skip_step');
+    } else if (action === 'fail' || action === 'skip') {
+      openConfirmationDialog(stepIndex, action);
     }
-
-    (window as any).resumeTest?.();
   };
 
   const copyToClipboard = async (text: string) => {
@@ -55,6 +104,27 @@ export default function StepsList() {
 
   const isStepCompleted = (step: any) => step.status === 'pass' || step.status === 'fail' || step.status === 'warning';
   const isCurrentStep = (stepIndex: number) => stepIndex === state.steps.length - 1 && state.steps[stepIndex].status === 'pending';
+
+  const getConfirmationDialogConfig = () => {
+    if (confirmationType === 'fail') {
+      return {
+        title: 'Step Failed?',
+        message: 'This will mark the step as failed',
+        actionLabel: 'Step Failed',
+        isDangerous: true,
+        showReasonInput: true,
+      };
+    }
+    return {
+      title: 'Skip Step?',
+      message: 'The test will continue without verifying this step',
+      actionLabel: 'Skip Step',
+      isDangerous: false,
+      showReasonInput: true,
+    };
+  };
+
+  const dialogConfig = getConfirmationDialogConfig();
 
   return (
     <div className="space-y-4 mt-4">
@@ -188,6 +258,20 @@ export default function StepsList() {
           )}
         </div>
       ))}
+
+      <ConfirmationDialog
+        isOpen={confirmationOpen}
+        title={dialogConfig.title}
+        message={dialogConfig.message}
+        actionLabel={dialogConfig.actionLabel}
+        isDangerous={dialogConfig.isDangerous}
+        showReasonInput={dialogConfig.showReasonInput}
+        reasonValue={failureReason}
+        onReasonChange={setFailureReason}
+        onConfirm={handleConfirmAction}
+        onCancel={handleCancelAction}
+        reasonPlaceholder={confirmationType === 'skip' ? 'Reason for skipping (optional)' : 'Describe why this step failed (optional)'}
+      />
     </div>
   );
-} 
+}

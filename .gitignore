@@ -8,6 +8,8 @@ node_modules/
 /test-builder-build
 /dist
 /index.html
+/*.test.ts
+/*.spec.ts
 
 .env
 .DS_Store

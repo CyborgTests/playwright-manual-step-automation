@@ -57,7 +57,9 @@ export default function StepsList() {
       trackButtonClick('fail_step');
       trackEvent('confirmation_failed');
     } else if (confirmationType === 'skip') {
-      dispatch({ type: 'SKIP_STEP' });
+      const reason = failureReason || 'Step skipped';
+      dispatch({ type: 'SKIP_STEP', payload: reason });
+      (window as any).testUtils?.skipTest?.();
       (window as any).testUtils?.resumeTest?.();
       trackButtonClick('skip_step');
       trackEvent('confirmation_skipped');

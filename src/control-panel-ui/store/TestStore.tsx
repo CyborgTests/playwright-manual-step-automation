@@ -31,7 +31,7 @@ export type Action =
   | { type: 'ADD_STEP'; payload: { step: string; isSoft?: boolean; data?: Record<string, any> } }
   | { type: 'PASS_STEP' }
   | { type: 'FAIL_STEP'; payload: string }
-  | { type: 'SKIP_STEP' }
+  | { type: 'SKIP_STEP'; payload?: string }
   | { type: 'TOGGLE_JIRA_TICKET' };
 
 function reducer(state: State, action: Action): State {
@@ -77,7 +77,7 @@ function reducer(state: State, action: Action): State {
         steps[steps.length - 1] = {
           ...steps[steps.length - 1],
           status: 'warning',
-          reason: 'Step skipped',
+          reason: action.payload || 'Step skipped',
         };
       }
       return { ...state, steps };

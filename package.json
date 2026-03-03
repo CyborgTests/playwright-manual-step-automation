@@ -1,6 +1,6 @@
 {
   "name": "@cyborgtests/test",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Powerfull extension for Playwright, that allows you to include manual verification steps in your automated test flow",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

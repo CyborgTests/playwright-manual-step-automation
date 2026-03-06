@@ -208,7 +208,7 @@ const test = pwTest.extend<{
       test.setTimeout(0);
       return await test.step(
         `✋ [MANUAL] ${stepName}`,
-        async () => {
+        async (step) => {
           const tc = await (testControl as any)._getTestControl();
           (testControl as any)._initialized = true;
 
@@ -261,8 +261,38 @@ const test = pwTest.extend<{
               delete (window as any).testUtils.failedReason;
               return reason;
             });
-            const errorMessage = `${stepName}${reason ? ` - ${reason}` : ""}`;
-            throw new TestFailedError(errorMessage);
+            const failureReason = reason || "Failure reason not provided";
+            const failDescription = `Manual step failed: ${stepName} - ${failureReason}`;
+            if (!params.isSoft) {
+              test.info().annotations.push({
+                type: "fail",
+                description: failDescription,
+              });
+            }
+            throw new TestFailedError(
+              params.isSoft
+                ? `${stepName} - ${failureReason}`
+                : failDescription,
+            );
+          }
+          const skipInfo = await tc.page.evaluate(() => {
+            const utils = (window as any).testUtils;
+            if (!utils?.isSkipped) {
+              return { isSkipped: false, reason: "" };
+            }
+            const reason = utils.skipReason || "";
+            delete utils.isSkipped;
+            delete utils.skipReason;
+            return { isSkipped: true, reason };
+          });
+          if (skipInfo.isSkipped) {
+            const skipReason = skipInfo.reason || "Skip reason not provided";
+            const skipDescription = `Manual step skipped: ${stepName} - ${skipReason}`;
+            test.info().annotations.push({
+              type: "skip",
+              description: skipDescription,
+            });
+            (step as any).skip?.(true, skipDescription);
           }
         },
         { box: true, timeout: 0 },
@@ -278,17 +308,14 @@ const test = pwTest.extend<{
           try {
             await manualStep(stepName, { isSoft: true, ...params });
           } catch (err) {
+            const message = (err as Error)?.message || "";
             test.info().annotations.push({
               type: "softFail",
-              description: `Soft fail in manual step: ${(err as Error).message}`,
+              description: `Soft fail in manual step: ${message}`,
             });
-            await expect
-              .soft(
-                false,
-                `Soft fail in manual step: ${(err as Error).message}`,
-              )
+            expect
+              .soft(false, `Soft fail in manual step: ${message}`)
               .toBeTruthy();
-            console.warn(`Soft fail in manual step: ${stepName}`, err);
           }
         },
         { box: true, timeout: 0 },

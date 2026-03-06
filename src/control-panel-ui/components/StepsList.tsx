@@ -57,9 +57,12 @@ export default function StepsList() {
       trackButtonClick('fail_step');
       trackEvent('confirmation_failed');
     } else if (confirmationType === 'skip') {
-      const reason = failureReason || 'Step skipped';
-      dispatch({ type: 'SKIP_STEP', payload: reason });
-      (window as any).testUtils?.skipTest?.();
+      dispatch({ type: 'SKIP_STEP', payload: failureReason });
+      if ((window as any).testUtils) {
+        (window as any).testUtils.isSkipped = true;
+        (window as any).testUtils.skipReason =
+          failureReason || 'Skip reason not provided';
+      }
       (window as any).testUtils?.resumeTest?.();
       trackButtonClick('skip_step');
       trackEvent('confirmation_skipped');
@@ -167,7 +170,9 @@ export default function StepsList() {
               )}
               {step.status === 'warning' && (
                 <p className="text-xs text-yellow-600 mt-1">
-                  {step.reason === 'Step skipped' ? 'Step skipped' : `Soft failed${step.reason ? ` - ${step.reason}` : ''}`}
+                  {step.isSkipped
+                    ? `Step skipped${step.reason ? ` - ${step.reason}` : ''}`
+                    : `Soft failed${step.reason ? ` - ${step.reason}` : ''}`}
                 </p>
               )}
             </div>

@@ -7,6 +7,7 @@ export type Step = {
   status: 'pending' | 'pass' | 'fail' | 'warning';
   reason?: string;
   isSoft?: boolean;
+  isSkipped?: boolean;
   data?: Record<string, any>;
 };
 
@@ -67,6 +68,7 @@ function reducer(state: State, action: Action): State {
           ...steps[steps.length - 1],
           status: steps[steps.length - 1].isSoft ? 'warning' : 'fail',
           reason: action.payload,
+          isSkipped: false,
         };
       }
       return { ...state, steps };
@@ -77,7 +79,8 @@ function reducer(state: State, action: Action): State {
         steps[steps.length - 1] = {
           ...steps[steps.length - 1],
           status: 'warning',
-          reason: action.payload || 'Step skipped',
+          reason: action.payload || 'Skip reason not provided',
+          isSkipped: true,
         };
       }
       return { ...state, steps };

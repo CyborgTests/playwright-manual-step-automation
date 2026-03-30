@@ -10,7 +10,7 @@ function AppContent() {
   const { state } = useTestStore();
 
   return (
-    <div className="relative flex flex-col h-screen bg-background">
+    <div className="relative flex flex-col min-h-screen bg-background">
       {
         state.createJiraTicket ? <JiraTicket /> : <TestControlPanel />
       }

@@ -70,12 +70,13 @@ const test = pwTest.extend<{
       if (!tcBrowser) {
         tcBrowser = await chromium.launch({
           headless: false,
+          args: ["--window-size=500,750"],
         });
 
         server = await startServer(config.uiPort);
 
         tcPage = await tcBrowser.newPage({
-          viewport: { width: 500, height: 750 },
+          viewport: null,
         });
 
         const { script, styles } = await getFile();

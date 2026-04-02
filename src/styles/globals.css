@@ -20,10 +20,19 @@
     }
 }
 
+html {
+  height: 100%;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
+  width: 500px;
+  max-width: 500px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .openDocumentPIP {
@@ -32,9 +41,8 @@ body {
   right: 20px;
   background-color: transparent;
   border: none;
-  padding: 0;
-  margin: 0;
   padding: 5px;
+  margin: 0;
   width: unset;
   font-size: 0;
 }

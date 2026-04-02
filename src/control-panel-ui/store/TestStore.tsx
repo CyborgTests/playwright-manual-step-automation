@@ -33,6 +33,7 @@ export type Action =
   | { type: 'PASS_STEP' }
   | { type: 'FAIL_STEP'; payload: string }
   | { type: 'SKIP_STEP'; payload?: string }
+  | { type: 'SKIP_TEST'; payload?: string }
   | { type: 'TOGGLE_JIRA_TICKET' };
 
 function reducer(state: State, action: Action): State {
@@ -73,13 +74,14 @@ function reducer(state: State, action: Action): State {
       }
       return { ...state, steps };
     }
-    case 'SKIP_STEP': {
+    case 'SKIP_STEP':
+    case 'SKIP_TEST': {
       const steps = [...state.steps];
       if (steps.length > 0) {
         steps[steps.length - 1] = {
           ...steps[steps.length - 1],
           status: 'warning',
-          reason: action.payload || 'Skip reason not provided',
+          reason: action.payload || (action.type === 'SKIP_TEST' ? 'Test skipped' : 'Skip reason not provided'),
           isSkipped: true,
         };
       }

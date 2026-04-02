@@ -7,6 +7,7 @@ import {
 } from "@playwright/test";
 import { chromium } from "playwright";
 import { config } from "./config";
+import { DEFAULT_SKIP_REASON, DEFAULT_FAILURE_REASON } from "./constants/messages";
 import { startServer } from "./utils/server";
 import openInDefaultBrowser from "./utils/openInDefaultBrowser";
 import {
@@ -201,6 +202,7 @@ const test = pwTest.extend<{
   manualStep: async ({ testControl, page, browser, context }, use) => {
     let currentResumeResolver: (() => void) | null = null;
     let resumeFunctionExposed = false;
+    let skipTestRequested = false;
 
     const manualStep = async (
       stepName: string,
@@ -249,20 +251,30 @@ const test = pwTest.extend<{
 
           await resumePromise;
 
-          const hasFailed = await tc.page.evaluate(() => {
-            if ((window as any).testUtils.hasFailed) {
-              delete (window as any).testUtils.hasFailed;
-              return true;
-            }
-            return false;
+          const stepState = await tc.page.evaluate(() => {
+            const utils = (window as any).testUtils;
+            return {
+              hasFailed: !!utils?.hasFailed,
+              failedReason: utils?.failedReason || "",
+              isSkipped: !!utils?.isSkipped,
+              skipReason: utils?.skipReason || "",
+              isTestSkipped: !!utils?.isTestSkipped,
+              testSkipReason: utils?.testSkipReason || "",
+            };
           });
-          if (hasFailed) {
-            const reason = await tc.page.evaluate(() => {
-              const reason = (window as any).testUtils?.failedReason || "";
-              delete (window as any).testUtils.failedReason;
-              return reason;
-            });
-            const failureReason = reason || "Failure reason not provided";
+
+          await tc.page.evaluate(() => {
+            const utils = (window as any).testUtils;
+            delete utils.hasFailed;
+            delete utils.failedReason;
+            delete utils.isSkipped;
+            delete utils.skipReason;
+            delete utils.isTestSkipped;
+            delete utils.testSkipReason;
+          });
+
+          if (stepState.hasFailed) {
+            const failureReason = stepState.failedReason || DEFAULT_FAILURE_REASON;
             const failDescription = `Manual step failed: ${stepName} - ${failureReason}`;
             if (!params.isSoft) {
               test.info().annotations.push({
@@ -276,24 +288,23 @@ const test = pwTest.extend<{
                 : failDescription,
             );
           }
-          const skipInfo = await tc.page.evaluate(() => {
-            const utils = (window as any).testUtils;
-            if (!utils?.isSkipped) {
-              return { isSkipped: false, reason: "" };
-            }
-            const reason = utils.skipReason || "";
-            delete utils.isSkipped;
-            delete utils.skipReason;
-            return { isSkipped: true, reason };
-          });
-          if (skipInfo.isSkipped) {
-            const skipReason = skipInfo.reason || "Skip reason not provided";
-            const skipDescription = `Manual step skipped: ${stepName} - ${skipReason}`;
+          if (stepState.isSkipped) {
+            const skipReason = stepState.skipReason || DEFAULT_SKIP_REASON;
+            const skipDescription = `Step is skipped: ${stepName}: ${skipReason}`;
             test.info().annotations.push({
               type: "skip",
               description: skipDescription,
             });
             (step as any).skip?.(true, skipDescription);
+          }
+          if (stepState.isTestSkipped) {
+            const skipReason = stepState.testSkipReason || DEFAULT_SKIP_REASON;
+            test.info().annotations.push({
+              type: "skip",
+              description: "Test is skipped:",
+            });
+            skipTestRequested = true;
+            test.skip(true, skipReason);
           }
         },
         { box: true, timeout: 0 },
@@ -309,6 +320,9 @@ const test = pwTest.extend<{
           try {
             await manualStep(stepName, { isSoft: true, ...params });
           } catch (err) {
+            if (skipTestRequested) {
+              throw err;
+            }
             const message = (err as Error)?.message || "";
             test.info().annotations.push({
               type: "softFail",

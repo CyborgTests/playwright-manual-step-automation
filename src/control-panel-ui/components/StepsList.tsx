@@ -3,8 +3,9 @@ import { useTestStore } from '../store/TestStore';
 import React, { useState } from 'react';
 import { trackEvent } from '../../utils/analytics';
 import ConfirmationDialog from './ConfirmationDialog';
+import { DEFAULT_SKIP_REASON, DEFAULT_FAILURE_REASON } from '../../constants/messages';
 
-export type ConfirmationType = 'fail' | 'skip' | null;
+export type ConfirmationType = 'fail' | 'skip-step' | 'skip-test' | null;
 
 export default function StepsList() {
   const { state, dispatch } = useTestStore();
@@ -30,7 +31,7 @@ export default function StepsList() {
     trackEvent(`app_${buttonName}_click`);
   };
 
-  const openConfirmationDialog = (stepIndex: number, action: 'fail' | 'skip') => {
+  const openConfirmationDialog = (stepIndex: number, action: 'fail' | 'skip-step' | 'skip-test') => {
     const step = state.steps[stepIndex];
     if (step.status !== 'pending') return;
 
@@ -49,23 +50,33 @@ export default function StepsList() {
     if (step.status !== 'pending') return;
 
     if (confirmationType === 'fail') {
-      const reason = failureReason || 'Failure reason not provided';
+      const reason = failureReason || DEFAULT_FAILURE_REASON;
       dispatch({ type: 'FAIL_STEP', payload: reason });
       (window as any).testUtils.hasFailed = true;
       (window as any).testUtils.failedReason = reason;
       (window as any).testUtils?.resumeTest?.();
       trackButtonClick('fail_step');
       trackEvent('confirmation_failed');
-    } else if (confirmationType === 'skip') {
+    } else if (confirmationType === 'skip-step') {
       dispatch({ type: 'SKIP_STEP', payload: failureReason });
       if ((window as any).testUtils) {
         (window as any).testUtils.isSkipped = true;
         (window as any).testUtils.skipReason =
-          failureReason || 'Skip reason not provided';
+          failureReason || DEFAULT_SKIP_REASON;
       }
       (window as any).testUtils?.resumeTest?.();
       trackButtonClick('skip_step');
-      trackEvent('confirmation_skipped');
+      trackEvent('confirmation_skip_step');
+    } else if (confirmationType === 'skip-test') {
+      const skipReason = failureReason || DEFAULT_SKIP_REASON;
+      if ((window as any).testUtils) {
+        (window as any).testUtils.isTestSkipped = true;
+        (window as any).testUtils.testSkipReason = skipReason;
+      }
+      dispatch({ type: 'SKIP_TEST', payload: skipReason });
+      (window as any).testUtils?.resumeTest?.();
+      trackButtonClick('skip_test');
+      trackEvent('confirmation_skip_test');
     }
 
     setConfirmationOpen(false);
@@ -84,7 +95,7 @@ export default function StepsList() {
     setFailureReason('');
   };
 
-  const handleStepAction = (stepIndex: number, action: 'pass' | 'fail' | 'skip') => {
+  const handleStepAction = (stepIndex: number, action: 'pass' | 'fail' | 'skip-step' | 'skip-test') => {
     const step = state.steps[stepIndex];
     if (step.status !== 'pending') {
       return;
@@ -94,7 +105,7 @@ export default function StepsList() {
       dispatch({ type: 'PASS_STEP' });
       (window as any).testUtils?.resumeTest?.();
       trackButtonClick('pass_step');
-    } else if (action === 'fail' || action === 'skip') {
+    } else if (action === 'fail' || action === 'skip-step' || action === 'skip-test') {
       openConfirmationDialog(stepIndex, action);
     }
   };
@@ -120,10 +131,19 @@ export default function StepsList() {
         showReasonInput: true,
       };
     }
+    if (confirmationType === 'skip-step') {
+      return {
+        title: 'Skip Step?',
+        message: 'The test will continue without verifying this step',
+        actionLabel: 'Skip Step',
+        isDangerous: false,
+        showReasonInput: true,
+      };
+    }
     return {
-      title: 'Skip Step?',
-      message: 'The test will continue without verifying this step',
-      actionLabel: 'Skip Step',
+      title: 'Skip Test?',
+      message: 'The entire test will be skipped',
+      actionLabel: 'Skip Test',
       isDangerous: false,
       showReasonInput: true,
     };
@@ -191,28 +211,39 @@ export default function StepsList() {
               <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
                   <Button
-                    className="flex-1 text-white border-none"
-                    onPress={() => handleStepAction(idx, 'pass')}
                     color="success"
+                    variant="solid"
+                    className="flex-1 text-white"
+                    onPress={() => handleStepAction(idx, 'pass')}
                   >
                     Passed
                   </Button>
                   <Button
-                    className="flex-1 text-white border-none"
-                    onPress={() => handleStepAction(idx, 'fail')}
                     color="danger"
+                    variant="solid"
+                    className="flex-1"
+                    onPress={() => handleStepAction(idx, 'fail')}
                   >
                     Failed
                   </Button>
                 </div>
-                <Button
-                  color="default"
-                  variant="bordered"
-                  className="w-full"
-                  onPress={() => handleStepAction(idx, 'skip')}
-                >
-                  Skip Step
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="bordered"
+                    className="flex-1"
+                    onPress={() => handleStepAction(idx, 'skip-step')}
+                  >
+                    Skip Step
+                  </Button>
+                  <Button
+                    color="default"
+                    variant="flat"
+                    className="flex-1"
+                    onPress={() => handleStepAction(idx, 'skip-test')}
+                  >
+                    Skip Test
+                  </Button>
+                </div>
                 <Button
                   className="w-full bg-indigo-500 text-white"
                   onPress={() => dispatch({ type: 'TOGGLE_JIRA_TICKET' })}
@@ -277,7 +308,7 @@ export default function StepsList() {
         onReasonChange={setFailureReason}
         onConfirm={handleConfirmAction}
         onCancel={handleCancelAction}
-        reasonPlaceholder={confirmationType === 'skip' ? 'Reason for skipping (optional)' : 'Describe why this step failed (optional)'}
+        reasonPlaceholder={confirmationType === 'skip-step' ? 'Reason for skipping (optional)' : confirmationType === 'skip-test' ? 'Reason for skipping test (optional)' : 'Describe why this step failed (optional)'}
       />
     </div>
   );

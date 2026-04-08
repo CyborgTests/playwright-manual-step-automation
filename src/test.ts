@@ -7,7 +7,10 @@ import {
 } from "@playwright/test";
 import { chromium } from "playwright";
 import { config } from "./config";
-import { DEFAULT_SKIP_REASON, DEFAULT_FAILURE_REASON } from "./constants/messages";
+import {
+  DEFAULT_SKIP_REASON,
+  DEFAULT_FAILURE_REASON,
+} from "./constants/messages";
 import { startServer } from "./utils/server";
 import openInDefaultBrowser from "./utils/openInDefaultBrowser";
 import {
@@ -69,15 +72,21 @@ const test = pwTest.extend<{
 
     const getTestControl = async () => {
       if (!tcBrowser) {
+        const controlPanelSize = { width: 500, height: 750 };
+        const hasDeviceScaleFactor = !!(testInfo.project.use as any)
+          ?.deviceScaleFactor;
+
         tcBrowser = await chromium.launch({
           headless: false,
-          args: ["--window-size=500,750"],
+          args: [
+            `--window-size=${controlPanelSize.width},${controlPanelSize.height}`,
+          ],
         });
 
         server = await startServer(config.uiPort);
 
         tcPage = await tcBrowser.newPage({
-          viewport: null,
+          viewport: hasDeviceScaleFactor ? controlPanelSize : null,
         });
 
         const { script, styles } = await getFile();
@@ -274,7 +283,8 @@ const test = pwTest.extend<{
           });
 
           if (stepState.hasFailed) {
-            const failureReason = stepState.failedReason || DEFAULT_FAILURE_REASON;
+            const failureReason =
+              stepState.failedReason || DEFAULT_FAILURE_REASON;
             const failDescription = `Manual step failed: ${stepName} - ${failureReason}`;
             if (!params.isSoft) {
               test.info().annotations.push({
